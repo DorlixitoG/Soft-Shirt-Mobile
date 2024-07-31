@@ -19,7 +19,8 @@
         "foregroundImage": "./assets/images/Logo_1.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dorlixito.lachuchota","versionCode":1
+      "package": "com.dorlixito.lachuchota",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
