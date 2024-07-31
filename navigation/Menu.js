@@ -1,14 +1,14 @@
-import { Block, theme } from "galio-framework";
+import { theme } from "galio-framework";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { DrawerItem as DrawerCustomItem } from "../components";
 import Images from "../constants/Images";
 import React from "react";
 
 function CustomDrawerContent({
-  drawerPosition, // Posición del drawer (izquierda o derecha)
+  drawerPosition = "left", // Posición del drawer por defecto
   navigation, // Objeto de navegación para cambiar pantallas
   profile, // Información del perfil (no se usa en este fragmento)
-  focused, // Estado de enfoque (no se usa en este fragmento)
+  focused = false, // Estado de enfoque por defecto
   state, // Estado de la navegación (para saber qué pantalla está activa)
   ...rest // Propiedades adicionales (no usadas en este fragmento)
 }) {
@@ -22,14 +22,11 @@ function CustomDrawerContent({
   };
 
   return (
-    <Block
-      style={styles.container} // Aplicar estilos al contenedor principal
-      forceInset={{ top: "always", horizontal: "never" }} // Configura el espaciado en los bordes del drawer
-    >
+    <View style={styles.container} {...rest}>
       <View style={styles.header}>
         <Image style={styles.logo} source={Images.Logo} />
       </View>
-      <Block flex style={styles.menuContainer}>
+      <View style={styles.menuContainer}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {/* Mapea las pantallas y crea un item para cada una */}
           {screens.map((item, index) => (
@@ -45,8 +42,8 @@ function CustomDrawerContent({
           {/* Botón para cerrar sesión */}
           <DrawerCustomItem title="Cerrar sesión" onPress={handleLogout} />
         </View>
-      </Block>
-    </Block>
+      </View>
+    </View>
   );
 }
 

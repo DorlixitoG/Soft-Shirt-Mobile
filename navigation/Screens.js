@@ -93,7 +93,7 @@ function AppStack(props) {
         name="HomeScreen"
         component={HomeStack} // Muestra la pila de pantallas de Home
         options={{
-          headerShown: false, // No muestra el header para esta pantalla
+          title: "Gestión de Productos",
         }}
       />
       {/* Pantalla de Compras */}
@@ -101,7 +101,7 @@ function AppStack(props) {
         name="ComprasScreen"
         component={ComprasStack} // Muestra la pila de pantallas de Compras
         options={{
-          headerShown: false, // No muestra el header para esta pantalla
+          title: "Gestión de Compras",
         }}
       />
     </Drawer.Navigator>
@@ -119,9 +119,11 @@ export default function OnboardingStack(props) {
     >
       {/* Pantalla de inicio de sesión */}
       <Stack.Screen name="SignIn" component={SigninScreen} />
+
       {/* Pantalla principal de la aplicación */}
       <Stack.Screen name="App" component={AppStack} />
       {/* Pantalla para recuperación de contraseña */}
+
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       {/* Pantalla para establecer una nueva contraseña */}
       <Stack.Screen name="NewPasswordScreen" component={NewPasswordScreen} />

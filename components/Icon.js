@@ -1,7 +1,6 @@
 import React from "react";
 import * as Font from "expo-font";
 import { createIconSetFromIcoMoon } from "@expo/vector-icons";
-import { Icon } from "galio-framework";
 
 // Configuración del conjunto de íconos personalizados en formato JSON
 import softshirtConfig from "../assets/config/softshirt.json";
@@ -41,9 +40,6 @@ class IconExtra extends React.Component {
         );
       }
       // Usa el ícono estándar de Galio Framework para otras familias
-      return (
-        <Icon name={name} family={family} size={size} color={color} {...rest} />
-      );
     }
 
     // No renderiza nada si la fuente no está cargada o si falta nombre o familia

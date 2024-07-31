@@ -1,14 +1,11 @@
 import React from "react";
-import { StyleSheet, Pressable } from "react-native";
-import { Block, Text } from "galio-framework";
+import { StyleSheet, Pressable, View, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import argonTheme from "../constants/Theme";
 
 // Componente DrawerItem para elementos en el menú lateral
-
 const DrawerItem = ({ navigation, title, focused = false, onPress }) => {
   // Maneja la acción cuando se presiona el ítem del menú
-
   const handlePress = () => {
     if (title === "Cerrar sesión") {
       if (onPress) onPress(); // Llamar a la función onPress para cerrar sesión
@@ -59,20 +56,20 @@ const DrawerItem = ({ navigation, title, focused = false, onPress }) => {
 
   return (
     <Pressable style={{ height: 60 }} onPress={handlePress}>
-      <Block flex row style={containerStyles}>
-        <Block middle flex={0.1} style={{ marginRight: 5 }}>
-          {renderIcon()}
-        </Block>
-        <Block row center flex={0.9}>
+      <View style={containerStyles}>
+        <View style={styles.iconContainer}>{renderIcon()}</View>
+        <View style={styles.textContainer}>
           <Text
-            size={15}
-            bold={focused}
-            color={focused ? "white" : "rgba(0,0,0,0.5)"}
+            style={[
+              styles.text,
+              { color: focused ? "white" : "rgba(0,0,0,0.5)" },
+              focused && styles.boldText,
+            ]}
           >
             {title}
           </Text>
-        </Block>
-      </Block>
+        </View>
+      </View>
     </Pressable>
   );
 };
@@ -81,13 +78,33 @@ const styles = StyleSheet.create({
   defaultStyle: {
     paddingVertical: 16,
     paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
   },
   activeStyle: {
     backgroundColor: argonTheme.COLORS.ACTIVE,
     borderRadius: 4,
   },
   shadow: {
-    boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)", // Actualizado
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    shadowOpacity: 1,
+    elevation: 2,
+  },
+  iconContainer: {
+    marginRight: 5,
+    alignItems: "center",
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  text: {
+    fontSize: 15,
+  },
+  boldText: {
+    fontWeight: "bold",
   },
 });
 

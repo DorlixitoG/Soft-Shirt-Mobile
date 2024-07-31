@@ -1,7 +1,15 @@
 import React from "react";
-import { StyleSheet, Dimensions, FlatList, Animated } from "react-native";
-import { Block, theme } from "galio-framework";
+import {
+  StyleSheet,
+  Dimensions,
+  FlatList,
+  Animated,
+  View,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import argonTheme from "../constants/Theme";
+import { theme } from "galio-framework"; // Mantén el tema
 
 // Obtiene el ancho de la pantalla para ajustar el estilo de las pestañas
 const { width } = Dimensions.get("screen");
@@ -93,14 +101,18 @@ export default class Tabs extends React.Component {
     ];
 
     return (
-      <Block style={containerStyles}>
-        <Animated.Text
-          style={[styles.menuTitle, { color: textColor }]} // Aplica el color interpolado
-          onPress={() => this.selectMenu(item.id)} // Maneja la selección de la pestaña
+      <View style={containerStyles}>
+        <TouchableOpacity
+          onPress={() => this.selectMenu(item.id)}
+          style={styles.menuButton}
         >
-          {item.title}
-        </Animated.Text>
-      </Block>
+          <Animated.Text
+            style={[styles.menuTitle, { color: textColor }]} // Aplica el color interpolado
+          >
+            {item.title}
+          </Animated.Text>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -126,7 +138,7 @@ export default class Tabs extends React.Component {
 
   // Renderiza el componente principal
   render() {
-    return <Block style={styles.container}>{this.renderMenu()}</Block>;
+    return <View style={styles.container}>{this.renderMenu()}</View>;
   }
 }
 
@@ -169,5 +181,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     color: argonTheme.COLORS.MUTED,
+  },
+  menuButton: {
+    justifyContent: "center",
   },
 });
