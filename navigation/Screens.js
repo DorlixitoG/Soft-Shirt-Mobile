@@ -117,11 +117,12 @@ export default function OnboardingStack(props) {
         headerShown: false, // No muestra el header para las pantallas del onboarding
       }}
     >
+          <Stack.Screen name="App" component={AppStack} />
+
       {/* Pantalla de inicio de sesión */}
       <Stack.Screen name="SignIn" component={SigninScreen} />
 
       {/* Pantalla principal de la aplicación */}
-      <Stack.Screen name="App" component={AppStack} />
       {/* Pantalla para recuperación de contraseña */}
 
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />

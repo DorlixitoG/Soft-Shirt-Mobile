@@ -29,10 +29,8 @@ const ComprasScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Número de elementos por página
 
-  // Estados
+  // Efecto para obtener datos al montar el componente
   useEffect(() => {
     getCompras();
     getProveedores();
@@ -51,6 +49,7 @@ const ComprasScreen = () => {
       setShowAlert(true);
     }
   };
+
   // Obtener proveedores desde la API
   const getProveedores = async () => {
     try {
@@ -109,16 +108,9 @@ const ComprasScreen = () => {
 
     return (
       proveedor.toLowerCase().includes(searchTermLower) ||
-      fecha.includes(formattedSearchTerm) || // Usa el término de búsqueda formateado
+      fecha.includes(formattedSearchTerm) ||
       total.toLowerCase().includes(searchTermLower)
     );
-  };
-
-  // Paginación de compras
-  const paginatedCompras = (compras) => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return compras.slice(indexOfFirstItem, indexOfLastItem);
   };
 
   // Formatear precios
@@ -154,7 +146,6 @@ const ComprasScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Compras</Text>
       <TextInput
         placeholder="Buscar"
         value={searchTerm}
@@ -163,38 +154,10 @@ const ComprasScreen = () => {
       />
 
       <FlatList
-        data={paginatedCompras(compras.filter(filterCompras))}
+        data={compras.filter(filterCompras)}
         keyExtractor={(item) => item.IdCompra.toString()}
         renderItem={renderItem}
       />
-      <View style={styles.paginationContainer}>
-        <Pressable
-          onPress={() =>
-            setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-          }
-          disabled={currentPage === 1}
-          style={[
-            styles.paginationButton,
-            currentPage === 1 && styles.disabledButton,
-          ]}
-        >
-          <Text style={styles.paginationButtonText}>Anterior</Text>
-        </Pressable>
-        <Text style={styles.pageNumber}>Página {currentPage}</Text>
-        <Pressable
-          onPress={() => setCurrentPage((prevPage) => prevPage + 1)}
-          disabled={
-            currentPage * itemsPerPage >= compras.filter(filterCompras).length
-          }
-          style={[
-            styles.paginationButton,
-            currentPage * itemsPerPage >=
-              compras.filter(filterCompras).length && styles.disabledButton,
-          ]}
-        >
-          <Text style={styles.paginationButtonText}>Siguiente</Text>
-        </Pressable>
-      </View>
 
       <Modal
         visible={modalVisible}
@@ -264,11 +227,6 @@ const ComprasScreen = () => {
         message="Hubo un problema al obtener los datos"
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
-        showCancelButton={false}
-        showConfirmButton={true}
-        confirmText="OK"
-        confirmButtonColor="#01c05f"
-        onConfirmPressed={() => setShowAlert(false)}
       />
     </View>
   );
@@ -377,20 +335,6 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     marginBottom: 16,
     backgroundColor: "#fff",
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  paginationButtonText: {
-    color: "#01c05f",
-    fontSize: 16,
-  },
-  pageNumber: {
-    fontSize: 16,
-    alignSelf: "center",
   },
 });
 

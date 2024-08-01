@@ -25,7 +25,7 @@ function CustomDrawerContent({
     <View style={styles.container} {...rest}>
       <View style={styles.header}>
         <Image style={styles.logo} source={Images.Logo} />
-      </View>
+      </View> 
       <View style={styles.menuContainer}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {/* Mapea las pantallas y crea un item para cada una */}

@@ -49,9 +49,7 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteId, setDeleteId] = useState(null);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
-  // Estado para paginación
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+
 
   // Efecto para obtener datos al cargar el componente
 
@@ -127,7 +125,7 @@ const Home = () => {
     setInsumoExpanded(false);
     setDisenioExpanded(false);
     setDetalleVisible(true);
-    setDetalleExpanded(!detalleExpanded && false); // Cambia el estado de expansión
+    setDetalleExpanded(!detalleExpanded && true); // Cambia el estado de expansión
   };
 
   const getInsumos = async () => {
@@ -351,13 +349,8 @@ const Home = () => {
       setDeleteId(null);
     }
   };
-  // Calcular las tallas actuales en función de la página
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = productosAdmin.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(productosAdmin.length / itemsPerPage);
+
   const filteredItems = productosAdmin
-    .slice(indexOfFirstItem, indexOfLastItem)
     .filter((producto) => {
       const disenio = Disenios.find((d) => d.IdDisenio === producto.IdDisenio);
       const insumo = Insumos.find((i) => i.IdInsumo === producto.IdInsumo);
@@ -439,16 +432,10 @@ const Home = () => {
     );
   };
 
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Productos</Text>
         <Pressable style={styles.createButton} onPress={() => openModal(1)}>
           <Icon name="plus" size={20} color="#fff" />
         </Pressable>
@@ -466,22 +453,6 @@ const Home = () => {
         renderItem={renderItem}
         contentContainerStyle={styles.flatListContent}
       />
-
-      <View style={styles.paginationContainer}>
-        <Pressable
-          onPress={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <Text style={styles.pageButton}>Anterior</Text>
-        </Pressable>
-        <Text style={styles.pageNumber}>Página {currentPage}</Text>
-        <Pressable
-          onPress={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <Text style={styles.pageButton}>Siguiente</Text>
-        </Pressable>
-      </View>
 
       <AwesomeAlert
         show={alertVisible}
