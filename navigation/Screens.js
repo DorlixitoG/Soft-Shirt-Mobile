@@ -109,39 +109,39 @@ function AppStack(props) {
   );
 }
 
-// Componente principal de navegación para la aplicación
-export default function OnboardingStack(props) {
+export default function Screens({ isLoggedIn }) {
   return (
     <Stack.Navigator
       screenOptions={{
-        mode: "card", // Estilo de transición para las pantallas
-        headerShown: false, // No muestra el header para las pantallas del onboarding
+        mode: "card",
+        headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="LoadingScreen"
-        component={LoadingScreen}
-        options={{ headerShown: false }}
-      />
+      {isLoggedIn ? (
+        <>
+          <Stack.Screen name="App" component={AppStack} />
+          <Stack.Screen name="SignIn" component={SigninScreen} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="Loading" component={LoadingScreen} />
 
-      <Stack.Screen name="App" component={AppStack} />
-
-      {/* Pantalla de inicio de sesión */}
-      <Stack.Screen name="SignIn" component={SigninScreen} />
-
-      {/* Pantalla principal de la aplicación */}
-      {/* Pantalla para recuperación de contraseña */}
-
-      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-      {/* Pantalla para establecer una nueva contraseña */}
-      <Stack.Screen name="NewPasswordScreen" component={NewPasswordScreen} />
-      {/* Pantalla para verificar el código */}
-      <Stack.Screen
-        name="CodigoVerificacionScreen"
-        component={CodigoVerificacionScreen}
-      />
-      {/* Pantalla de Compras (duplicado de la pantalla en el drawer) */}
-      <Stack.Screen name="Compras" component={ComprasScreen} />
+          <Stack.Screen name="SignIn" component={SigninScreen} />
+          <Stack.Screen name="App" component={AppStack} />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+          />
+          <Stack.Screen
+            name="NewPasswordScreen"
+            component={NewPasswordScreen}
+          />
+          <Stack.Screen
+            name="CodigoVerificacionScreen"
+            component={CodigoVerificacionScreen}
+          />
+        </>
+      )}
     </Stack.Navigator>
   );
 }

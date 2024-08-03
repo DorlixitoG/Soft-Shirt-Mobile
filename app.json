@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Soft-Shirt-Mobile",
-    "slug": "lachuchota",
+    "slug": "soft-shirt",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,15 +19,15 @@
         "foregroundImage": "./assets/images/Logo_1.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dorlixito.lachuchota",
-      "versionCode": 1
+      "versionCode": 3,
+      "package": "com.dorlixito.softshirt"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "09dd4dff-a0e4-47f7-ba3b-d472d4878493"
+        "projectId": "055c47fc-5ef3-4540-a452-548c16fb6db2"
       }
     },
     "owner": "dorlixito"

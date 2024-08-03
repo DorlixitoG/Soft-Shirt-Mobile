@@ -142,7 +142,6 @@ const Home = () => {
   };
   const openModal = (op, producto = {}) => {
     if (producto.Estado === "Inactivo") return; // Evitar abrir el modal si el producto está inactivo
-
     setIdProducto(producto.IdProducto || "");
     setIdDisenio(producto.IdDisenio || "");
     setIdInsumo(producto.IdInsumo || "");
@@ -363,6 +362,14 @@ const Home = () => {
       insumo.Referencia.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
+  const formatPrice = (price) => {
+    const formattedPrice = parseFloat(price).toLocaleString("es-ES", {
+      style: "decimal",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
+    return `$${formattedPrice} COP`;
+  };
 
   // Renderizado de cada producto en la lista
 
@@ -373,7 +380,7 @@ const Home = () => {
     return (
       <Pressable onPress={() => verDetalle(item)} style={styles.item}>
         <View style={styles.itemContent}>
-          <View>
+          <View style={styles.itemDetails}>
             <Text style={styles.itemText}>Referencia: {item.Referencia}</Text>
             <Text style={styles.itemText}>
               Diseño: {disenio ? disenio.NombreDisenio : "No disponible"}
@@ -383,7 +390,7 @@ const Home = () => {
             </Text>
             <Text style={styles.itemText}>Cantidad: {item.Cantidad}</Text>
             <Text style={styles.itemText}>
-              Valor de la Venta: {item.ValorVenta}
+              Valor de la Venta: {formatPrice(item.ValorVenta)}
             </Text>
           </View>
           <View style={styles.buttonsContainer}>
@@ -489,6 +496,7 @@ const Home = () => {
             selectedValue={IdDisenio}
             onValueChange={(itemValue) => setIdDisenio(itemValue)}
             style={styles.picker}
+            enabled={operation !== 2} // Deshabilitar si es edición
           >
             <Picker.Item label="Selecciona diseño" value="" />
             {Disenios.map((disenio) => (
@@ -504,6 +512,7 @@ const Home = () => {
             selectedValue={IdInsumo}
             onValueChange={(itemValue) => setIdInsumo(itemValue)}
             style={styles.picker}
+            enabled={operation !== 2} // Deshabilitar si es edición
           >
             <Picker.Item label="Selecciona insumo" value="" />
             {Insumos.map((insumo) => (
@@ -521,6 +530,7 @@ const Home = () => {
             onChangeText={setReferencia}
             style={styles.input}
             maxLength={7} // Limitar la longitud del texto a 7 caracteres
+            editable={operation !== 2} // Deshabilitar si es edición
           />
           <TextInput
             placeholder="Cantidad"
@@ -748,7 +758,7 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: "#f5f5f5",
   },
   header: {
@@ -773,16 +783,21 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
+    marginBottom: 3,
+  },
+  itemDetails: {
+    flex: 1,
   },
   createButton: {
     backgroundColor: "#01c05f",
     padding: 10,
-    borderRadius: 4,
+    borderRadius: 5,
     marginLeft: 10, // Espacio entre el input y el botón
   },
   buttonsContainer: {
-    flexDirection: "column", // Organiza los botones verticalmente
-    alignItems: "flex-end", // Alinea los botones al final del contenedor
+    flexDirection: "column",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
   },
   switchContainer: {
     flexDirection: "row",
@@ -829,6 +844,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 15,
   },
   modalTitle: {
     fontSize: 24,
@@ -851,8 +867,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: "80%",
+    justifyContent: "flex-end",
+    flexShrink: 0,
   },
   button: {
     backgroundColor: "#01c05f",
@@ -900,14 +916,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: 5,
     backgroundColor: "#fff",
   },
   searchContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "space-between", // Ajusta el espaciado entre el buscador y el botón
-    marginBottom: 20, // Espacio inferior para separar de la lista
+    marginBottom: 10,
   },
 });
 

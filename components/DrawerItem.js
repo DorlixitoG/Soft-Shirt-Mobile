@@ -32,7 +32,7 @@ const DrawerItem = ({ navigation, title, focused = false, onPress }) => {
           <Icon
             name="cart-plus"
             size={14}
-            color={focused ? "white" : argonTheme.COLORS.ERROR}
+            color={focused ? "white" : argonTheme.COLORS.PRIMARY}
           />
         );
       case "Cerrar sesión":

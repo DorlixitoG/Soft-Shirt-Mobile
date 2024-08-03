@@ -289,8 +289,9 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "bold",
+    textAlign: "center", // Alinea el texto al centro
   },
   detailContainer: {
     marginBottom: 20,

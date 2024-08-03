@@ -33,6 +33,7 @@ const SigninScreen = () => {
       if (response.data.success) {
         // Guardar el token en AsyncStorage
         await AsyncStorage.setItem("authToken", response.data.token);
+        await AsyncStorage.setItem("Usuario", Usuario);
         navigation.navigate("App");
       } else {
         setErrorMessage(response.data.message || "Inicio de sesión fallido");
