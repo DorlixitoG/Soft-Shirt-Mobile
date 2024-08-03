@@ -3,6 +3,7 @@ import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { DrawerItem as DrawerCustomItem } from "../components";
 import Images from "../constants/Images";
 import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function CustomDrawerContent({
   drawerPosition = "left", // Posición del drawer por defecto
@@ -16,16 +17,20 @@ function CustomDrawerContent({
   const screens = ["Productos", "Compras"];
 
   // Función para manejar el cierre de sesión
-  const handleLogout = () => {
-    // Implementa aquí la lógica para cerrar sesión
-    navigation.navigate("SignIn"); // Navega a la pantalla de inicio de sesión
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("authToken");
+      navigation.navigate("SignIn");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   return (
     <View style={styles.container} {...rest}>
       <View style={styles.header}>
         <Image style={styles.logo} source={Images.Logo} />
-      </View> 
+      </View>
       <View style={styles.menuContainer}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {/* Mapea las pantallas y crea un item para cada una */}

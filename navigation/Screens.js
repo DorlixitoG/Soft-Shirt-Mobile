@@ -10,6 +10,7 @@ import ForgotPasswordScreen from "../screens/ForgotPasswordScreen/ForgotPassword
 import NewPasswordScreen from "../screens/NewPasswordScreen";
 import CodigoVerificacionScreen from "../screens/CodigoVerificacionScreen";
 import ComprasScreen from "../screens/ComprasScreen";
+import LoadingScreen from "../screens/LoadingScreen";
 
 // Obtiene el ancho de la pantalla para ajustar el estilo del drawer
 const { width } = Dimensions.get("screen");
@@ -117,7 +118,13 @@ export default function OnboardingStack(props) {
         headerShown: false, // No muestra el header para las pantallas del onboarding
       }}
     >
-          <Stack.Screen name="App" component={AppStack} />
+      <Stack.Screen
+        name="LoadingScreen"
+        component={LoadingScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen name="App" component={AppStack} />
 
       {/* Pantalla de inicio de sesión */}
       <Stack.Screen name="SignIn" component={SigninScreen} />

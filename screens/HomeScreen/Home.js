@@ -50,7 +50,6 @@ const Home = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
 
-
   // Efecto para obtener datos al cargar el componente
 
   useEffect(() => {
@@ -350,21 +349,20 @@ const Home = () => {
     }
   };
 
-  const filteredItems = productosAdmin
-    .filter((producto) => {
-      const disenio = Disenios.find((d) => d.IdDisenio === producto.IdDisenio);
-      const insumo = Insumos.find((i) => i.IdInsumo === producto.IdInsumo);
+  const filteredItems = productosAdmin.filter((producto) => {
+    const disenio = Disenios.find((d) => d.IdDisenio === producto.IdDisenio);
+    const insumo = Insumos.find((i) => i.IdInsumo === producto.IdInsumo);
 
-      return (
-        producto.Referencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        producto.Cantidad.toString().includes(searchTerm) ||
-        producto.ValorVenta.toString().includes(searchTerm) ||
-        disenio.NombreDisenio.toLowerCase().includes(
-          searchTerm.toLocaleLowerCase(),
-        ) ||
-        insumo.Referencia.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
+    return (
+      producto.Referencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      producto.Cantidad.toString().includes(searchTerm) ||
+      producto.ValorVenta.toString().includes(searchTerm) ||
+      disenio.NombreDisenio.toLowerCase().includes(
+        searchTerm.toLocaleLowerCase(),
+      ) ||
+      insumo.Referencia.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   // Renderizado de cada producto en la lista
 
@@ -432,20 +430,19 @@ const Home = () => {
     );
   };
 
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.searchContainer}>
+        <TextInput
+          placeholder="Buscar"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          style={styles.searchInput}
+        />
         <Pressable style={styles.createButton} onPress={() => openModal(1)}>
           <Icon name="plus" size={20} color="#fff" />
         </Pressable>
       </View>
-      <TextInput
-        placeholder="Buscar"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        style={styles.searchInput}
-      />
 
       <FlatList
         data={filteredItems}
@@ -780,7 +777,8 @@ const styles = StyleSheet.create({
   createButton: {
     backgroundColor: "#01c05f",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 4,
+    marginLeft: 10, // Espacio entre el input y el botón
   },
   buttonsContainer: {
     flexDirection: "column", // Organiza los botones verticalmente
@@ -898,12 +896,18 @@ const styles = StyleSheet.create({
     resizeMode: "contain", // O 'cover', dependiendo del efecto deseado
   },
   searchInput: {
-    width: "100%",
-    padding: 8,
-    borderWidth: 1,
+    flex: 1,
+    padding: 10,
     borderColor: "#ccc",
-    marginBottom: 16,
+    borderWidth: 1,
+    borderRadius: 4,
     backgroundColor: "#fff",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between", // Ajusta el espaciado entre el buscador y el botón
+    marginBottom: 20, // Espacio inferior para separar de la lista
   },
 });
 
