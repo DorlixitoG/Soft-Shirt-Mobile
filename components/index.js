@@ -3,4 +3,12 @@ import Header from "./Header";
 import CustomButton from "./CustomButton";
 import CustomInput from "./CustomInput";
 import Tabs from "./Tabs";
-export { DrawerItem, CustomInput, CustomButton, Header, Tabs };
+import LogoutConfirmation from "./LogoutConfirmation";
+export {
+  DrawerItem,
+  CustomInput,
+  CustomButton,
+  Header,
+  Tabs,
+  LogoutConfirmation,
+};

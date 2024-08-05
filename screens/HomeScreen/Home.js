@@ -15,8 +15,9 @@ import axios from "axios";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import AwesomeAlert from "react-native-awesome-alerts";
+import LogoutConfirmation from "../../components/LogoutConfirmation";
 
-const Home = () => {
+const Home = ({ navigation }) => {
   // URL de la API de productos
 
   const url = "https://prueba-despliegue-back.onrender.com/api/productos";
@@ -751,6 +752,7 @@ const Home = () => {
           </Pressable>
         </View>
       </Modal>
+      <LogoutConfirmation navigation={navigation} />
     </View>
   );
 };
