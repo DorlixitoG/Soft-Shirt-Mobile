@@ -17,6 +17,7 @@ const SigninScreen = () => {
   const [Usuario, setUsuario] = useState("");
   const [Contrasenia, setContrasenia] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
@@ -24,15 +25,18 @@ const SigninScreen = () => {
   const onSignInPressed = async () => {
     try {
       const response = await axios.post(
-        "https://prueba-despliegue-back.onrender.com/api/authMovil/login",
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/authMovil/login",
         {
           Usuario,
           Contrasenia,
         },
       );
       if (response.data.success) {
-        // Guardar el token en AsyncStorage
-        await AsyncStorage.setItem("authToken", response.data.token);
+        const { token, expiresAt } = response.data;
+        await AsyncStorage.setItem(
+          "authToken",
+          JSON.stringify({ token, expiresAt }),
+        );
         await AsyncStorage.setItem("Usuario", Usuario);
         navigation.navigate("App");
       } else {
@@ -65,6 +69,11 @@ const SigninScreen = () => {
     navigation.navigate("ForgotPassword");
   };
 
+  // Función para manejar el cambio de visibilidad de la contraseña
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <View style={styles.root}>
       <Text style={styles.welcomeText}>¡Bienvenido a Soft-Shirt!</Text>
@@ -77,12 +86,15 @@ const SigninScreen = () => {
         placeholder="Usuario"
         value={Usuario}
         setValue={setUsuario}
+        iconName="user" // Ícono de FontAwesome para el campo Usuario
       />
       <CustomInput
         placeholder="Contraseña"
         value={Contrasenia}
         setValue={setContrasenia}
-        secureTextEntry={true}
+        secureTextEntry={!showPassword} // Controla si el campo es de tipo contraseña
+        togglePasswordVisibility={togglePasswordVisibility}
+        iconName="lock" // Ícono de FontAwesome para el campo Contraseña
       />
       {errorMessage ? (
         <Text style={styles.errorText}>{errorMessage}</Text>

@@ -22,7 +22,7 @@ const ForgotPasswordScreen = () => {
     try {
       // Envío de solicitud POST para recuperación de contraseña
       const response = await axios.post(
-        "https://prueba-despliegue-back.onrender.com/api/forgot-password",
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/forgot-password",
         { Correo },
       );
       console.log("Respuesta del servidor:", response.data);

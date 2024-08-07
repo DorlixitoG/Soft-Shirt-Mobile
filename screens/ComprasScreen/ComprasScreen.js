@@ -16,10 +16,10 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 const ComprasScreen = () => {
   // URLs de la API
-  const comprasUrl = "https://prueba-despliegue-back.onrender.com/api/compras";
+  const comprasUrl = "https://back-end1-9e2f0d364f68.herokuapp.com/api/compras";
   const proveedoresUrl =
-    "https://prueba-despliegue-back.onrender.com/api/proveedores";
-  const insumosUrl = "https://prueba-despliegue-back.onrender.com/api/insumos";
+    "https://back-end1-9e2f0d364f68.herokuapp.com/api/proveedores";
+  const insumosUrl = "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos";
 
   // Estados
   const [compras, setCompras] = useState([]);

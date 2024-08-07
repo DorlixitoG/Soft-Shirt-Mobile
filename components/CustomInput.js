@@ -1,17 +1,45 @@
-import { View, TextInput, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet, Pressable } from "react-native";
 import React from "react";
+import FontAwesome from "react-native-vector-icons/FontAwesome"; // Importa FontAwesome
 
 // Componente CustomInput para un campo de entrada de texto personalizado
-const CustomInput = ({ value, setValue, placeholder, secureTextEntry }) => {
+const CustomInput = ({
+  value,
+  setValue,
+  placeholder,
+  secureTextEntry,
+  togglePasswordVisibility,
+  iconName,
+}) => {
   return (
     <View style={styles.container}>
+      {iconName && (
+        <FontAwesome
+          name={iconName}
+          size={20}
+          color="#888"
+          style={styles.icon}
+        />
+      )}
       <TextInput
-        value={value} // Valor actual del campo de entrada
-        onChangeText={setValue} // Función para actualizar el valor del campo
-        placeholder={placeholder} // Texto de marcador de posición
-        style={styles.input} // Estilo aplicado al campo de entrada
-        secureTextEntry={secureTextEntry} // Oculta el texto si es true (para contraseñas)
+        style={styles.input}
+        placeholder={placeholder}
+        value={value}
+        onChangeText={setValue}
+        secureTextEntry={secureTextEntry} // Controla si el campo es de tipo contraseña
       />
+      {togglePasswordVisibility && (
+        <Pressable
+          onPress={togglePasswordVisibility}
+          style={styles.iconContainer}
+        >
+          <FontAwesome
+            name={secureTextEntry ? "eye-slash" : "eye"}
+            size={20}
+            color="#888"
+          />
+        </Pressable>
+      )}
     </View>
   );
 };
@@ -26,11 +54,20 @@ const styles = StyleSheet.create({
     borderRadius: 5, // Radio del borde para esquinas redondeadas
     paddingHorizontal: 10, // Espaciado horizontal dentro del contenedor
     marginVertical: 5, // Espaciado vertical fuera del contenedor
+    flexDirection: "row", // Alinea el ícono y el campo de entrada horizontalmente
+    alignItems: "center", // Alinea verticalmente el ícono y el campo de entrada
   },
   input: {
-    width: "100%", // Ancho completo del campo de entrada
+    width: "85%", // Ajusta el ancho para dar espacio al ícono
     height: 40, // Altura del campo de entrada
     paddingHorizontal: 10, // Espaciado horizontal dentro del campo de entrada
+  },
+  icon: {
+    marginRight: 10, // Espaciado entre el ícono y el campo de entrada
+  },
+  iconContainer: {
+    position: "absolute", // Ubica el ícono de forma absoluta
+    right: 10, // Ubica el ícono a la derecha
   },
 });
 

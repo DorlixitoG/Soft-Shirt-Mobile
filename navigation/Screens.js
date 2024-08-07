@@ -117,15 +117,9 @@ export default function Screens({ isLoggedIn }) {
         headerShown: false,
       }}
     >
-      {isLoggedIn ? (
-        <>
-          <Stack.Screen name="App" component={AppStack} />
-          <Stack.Screen name="SignIn" component={SigninScreen} />
-        </>
-      ) : (
+      {!isLoggedIn ? (
         <>
           <Stack.Screen name="Loading" component={LoadingScreen} />
-
           <Stack.Screen name="SignIn" component={SigninScreen} />
           <Stack.Screen name="App" component={AppStack} />
           <Stack.Screen
@@ -140,6 +134,11 @@ export default function Screens({ isLoggedIn }) {
             name="CodigoVerificacionScreen"
             component={CodigoVerificacionScreen}
           />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="App" component={AppStack} />
+          <Stack.Screen name="SignIn" component={SigninScreen} />
         </>
       )}
     </Stack.Navigator>

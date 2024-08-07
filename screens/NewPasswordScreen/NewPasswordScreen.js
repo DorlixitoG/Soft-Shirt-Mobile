@@ -11,6 +11,7 @@ import AwesomeAlert from "react-native-awesome-alerts";
 const NewPasswordScreen = () => {
   // Definición de estados
   const [nuevaContrasenia, setnuevaContrasenia] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const navigation = useNavigation();
   const [userEmail, setUserEmail] = useState("");
@@ -29,7 +30,7 @@ const NewPasswordScreen = () => {
   const onSubmitPressed = async () => {
     try {
       await axios.post(
-        "https://prueba-despliegue-back.onrender.com/api/reset-password",
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/reset-password",
         {
           nuevaContrasenia,
           Correo: userEmail,
@@ -47,6 +48,11 @@ const NewPasswordScreen = () => {
     navigation.navigate("SignIn");
   };
 
+  // Función para manejar el cambio de visibilidad de la contraseña
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   // Función para navegar a la pantalla de inicio de sesión
   const backSingIn = () => {
     navigation.navigate("SignIn");
@@ -61,6 +67,8 @@ const NewPasswordScreen = () => {
           placeholder="Ingresa tu nueva contraseña"
           value={nuevaContrasenia}
           setValue={setnuevaContrasenia}
+          secureTextEntry={!showPassword} // Controla si el campo es de tipo contraseña
+          togglePasswordVisibility={togglePasswordVisibility} // Proporciona la función para alternar la visibilidad
         />
         <CustomButton text="Enviar" onPress={onSubmitPressed} />
         <CustomButton

@@ -20,7 +20,7 @@ import LogoutConfirmation from "../../components/LogoutConfirmation";
 const Home = ({ navigation }) => {
   // URL de la API de productos
 
-  const url = "https://prueba-despliegue-back.onrender.com/api/productos";
+  const url = "https://back-end1-9e2f0d364f68.herokuapp.com/api/productos";
 
   // Estados para manejar datos y UI
 
@@ -76,7 +76,7 @@ const Home = ({ navigation }) => {
   const getDisenios = async () => {
     try {
       const respuesta = await axios.get(
-        "https://prueba-despliegue-back.onrender.com/api/disenios",
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/disenios",
       );
       const DiseniosActivos = respuesta.data.filter(
         (disenio) => disenio.Estado === "Activo",
@@ -91,7 +91,7 @@ const Home = ({ navigation }) => {
   const getColores = async () => {
     try {
       const respuesta = await axios.get(
-        "https://prueba-despliegue-back.onrender.com/api/colores",
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/colores",
       );
       setColores(respuesta.data);
     } catch (error) {
@@ -102,7 +102,7 @@ const Home = ({ navigation }) => {
   const getTallas = async () => {
     try {
       const respuesta = await axios.get(
-        "https://prueba-despliegue-back.onrender.com/api/tallas",
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/tallas",
       );
       setTallas(respuesta.data);
     } catch (error) {
@@ -131,7 +131,7 @@ const Home = ({ navigation }) => {
   const getInsumos = async () => {
     try {
       const respuesta = await axios.get(
-        "https://prueba-despliegue-back.onrender.com/api/insumos",
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos",
       );
       const InsumosActivas = respuesta.data.filter(
         (insumo) => insumo.Estado === "Activo",
