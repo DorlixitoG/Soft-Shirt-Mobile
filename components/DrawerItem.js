@@ -13,6 +13,8 @@ const DrawerItem = ({ navigation, title, focused = false, onPress }) => {
       navigation.navigate("HomeScreen");
     } else if (title === "Compras") {
       navigation.navigate("ComprasScreen");
+    } else if (title === "Ventas") {
+      navigation.navigate("VentasScreen");
     }
   };
 
@@ -31,6 +33,14 @@ const DrawerItem = ({ navigation, title, focused = false, onPress }) => {
         return (
           <Icon
             name="cart-plus"
+            size={14}
+            color={focused ? "white" : argonTheme.COLORS.PRIMARY}
+          />
+        );
+      case "Ventas":
+        return (
+          <Icon
+            name="truck"
             size={14}
             color={focused ? "white" : argonTheme.COLORS.PRIMARY}
           />

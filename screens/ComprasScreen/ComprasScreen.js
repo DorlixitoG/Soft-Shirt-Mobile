@@ -227,6 +227,10 @@ const ComprasScreen = () => {
         message="Hubo un problema al obtener los datos"
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
+        showConfirmButton={true}
+        confirmText="Cerrar"
+        confirmButtonColor="#01c05f"
+        onConfirmPressed={() => setShowAlert(false)}
       />
     </View>
   );
@@ -236,12 +240,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f5f5f5", // Fondo gris claro
   },
   itemContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    backgroundColor: "#fff", // Fondo blanco para la cajita
+    padding: 15, // Borde redondeado
+    marginBottom: 8, // Espacio entre los ítems
   },
   contentContainer: {
     flexDirection: "row",
