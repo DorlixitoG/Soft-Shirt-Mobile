@@ -16,10 +16,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/Logo_1.png",
+        "foregroundImage": "./assets/images/Logo_Android.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 4,
+      "versionCode": 5,
       "package": "com.dorlixito.softshirt"
     },
     "web": {
