@@ -174,8 +174,14 @@ const Home = ({ navigation }) => {
       const productoActual = productosAdmin.find(
         (producto) => producto.IdProducto === IdProducto,
       );
-      const nuevoEstado =
+
+      // Cambia el estado del producto
+      const nuevoEstadoProducto =
         productoActual.Estado === "Activo" ? "Inactivo" : "Activo";
+
+      // Sincroniza el estado de la publicación con el del producto
+      const nuevoEstadoPublicacion =
+        nuevoEstadoProducto === "Activo" ? "Activo" : "Inactivo";
 
       const parametrosProducto = {
         IdProducto: IdProducto,
@@ -184,8 +190,8 @@ const Home = ({ navigation }) => {
         Referencia: productoActual.Referencia,
         Cantidad: productoActual.Cantidad,
         ValorVenta: productoActual.ValorVenta,
-        Publicacion: productoActual.Publicacion,
-        Estado: nuevoEstado,
+        Publicacion: nuevoEstadoPublicacion, // Sincroniza la publicación
+        Estado: nuevoEstadoProducto, // Cambia el estado del producto
       };
 
       const response = await axios.put(
@@ -194,28 +200,44 @@ const Home = ({ navigation }) => {
       );
 
       if (response.status === 200) {
-        setProductosAdmin((prevProducto) =>
-          prevProducto.map((producto) =>
+        setProductosAdmin((prevProductos) =>
+          prevProductos.map((producto) =>
             producto.IdProducto === IdProducto
-              ? { ...producto, Estado: nuevoEstado }
+              ? {
+                  ...producto,
+                  Estado: nuevoEstadoProducto,
+                  Publicacion: nuevoEstadoPublicacion,
+                }
               : producto,
           ),
         );
         setAlertTitle("Éxito");
-        setAlertMessage("Estado de la talla cambiado con éxito");
+        setAlertMessage("Estado y publicación cambiados con éxito");
         setAlertVisible(true);
       }
     } catch (error) {
       setAlertTitle("Error");
-      setAlertMessage("Error cambiando el estado de la talla");
+      setAlertMessage("Error al cambiar el estado y la publicación");
       setAlertVisible(true);
     }
   };
+
   const cambiarPublicacion = async (IdProducto) => {
     try {
       const productoActual = productosAdmin.find(
         (producto) => producto.IdProducto === IdProducto,
       );
+
+      // Verifica si el producto está inactivo
+      if (productoActual.Estado === "Inactivo") {
+        setAlertTitle("Advertencia");
+        setAlertMessage(
+          "No se puede cambiar la publicación de un producto inactivo.",
+        );
+        setAlertVisible(true);
+        return; // Detiene la ejecución si el producto está inactivo
+      }
+
       const nuevoEstado =
         productoActual.Publicacion === "Activo" ? "Inactivo" : "Activo";
 
@@ -227,7 +249,7 @@ const Home = ({ navigation }) => {
         Cantidad: productoActual.Cantidad,
         ValorVenta: productoActual.ValorVenta,
         Estado: productoActual.Estado,
-        Publicacion: nuevoEstado, // Incluye el campo 'Publicado'
+        Publicacion: nuevoEstado, // Actualiza el estado de publicación
       };
 
       const response = await axios.put(
@@ -244,7 +266,7 @@ const Home = ({ navigation }) => {
           ),
         );
         setAlertTitle("Éxito");
-        setAlertMessage("Publicación del producto cambiado con éxito");
+        setAlertMessage("Publicación del producto cambiada con éxito");
         setAlertVisible(true);
       }
     } catch (error) {
