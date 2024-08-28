@@ -32,6 +32,7 @@ const Home = ({ navigation }) => {
   const [IdProducto, setIdProducto] = useState("");
   const [IdDisenio, setIdDisenio] = useState("");
   const [IdInsumo, setIdInsumo] = useState("");
+  const [IdUsuario, setIdUsuario] = useState("");
   const [Referencia, setReferencia] = useState("");
   const [Cantidad, setCantidad] = useState("");
   const [ValorVenta, setValorVenta] = useState("");
@@ -50,6 +51,8 @@ const Home = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteId, setDeleteId] = useState(null);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
 
   // Efecto para obtener datos al cargar el componente
 
@@ -175,11 +178,9 @@ const Home = ({ navigation }) => {
         (producto) => producto.IdProducto === IdProducto,
       );
 
-      // Cambia el estado del producto
       const nuevoEstadoProducto =
         productoActual.Estado === "Activo" ? "Inactivo" : "Activo";
 
-      // Sincroniza el estado de la publicación con el del producto
       const nuevoEstadoPublicacion =
         nuevoEstadoProducto === "Activo" ? "Activo" : "Inactivo";
 
@@ -187,17 +188,25 @@ const Home = ({ navigation }) => {
         IdProducto: IdProducto,
         IdDisenio: productoActual.IdDisenio,
         IdInsumo: productoActual.IdInsumo,
+        IdUsuario: productoActual.IdUsuario,
         Referencia: productoActual.Referencia,
         Cantidad: productoActual.Cantidad,
         ValorVenta: productoActual.ValorVenta,
-        Publicacion: nuevoEstadoPublicacion, // Sincroniza la publicación
-        Estado: nuevoEstadoProducto, // Cambia el estado del producto
+        Publicacion: nuevoEstadoPublicacion,
+        Estado: nuevoEstadoProducto,
       };
+
+      console.log(
+        "Enviando parámetros para cambiar estado:",
+        parametrosProducto,
+      );
 
       const response = await axios.put(
         `${url}/${IdProducto}`,
         parametrosProducto,
       );
+
+      console.log("Respuesta del backend para cambiar estado:", response.data);
 
       if (response.status === 200) {
         setProductosAdmin((prevProductos) =>
@@ -216,6 +225,10 @@ const Home = ({ navigation }) => {
         setAlertVisible(true);
       }
     } catch (error) {
+      console.error(
+        "Error al cambiar estado y publicación:",
+        error.response?.data,
+      );
       setAlertTitle("Error");
       setAlertMessage("Error al cambiar el estado y la publicación");
       setAlertVisible(true);
@@ -245,6 +258,7 @@ const Home = ({ navigation }) => {
         IdProducto: IdProducto,
         IdDisenio: productoActual.IdDisenio,
         IdInsumo: productoActual.IdInsumo,
+        IdUsuario: productoActual.IdUsuario,
         Referencia: productoActual.Referencia,
         Cantidad: productoActual.Cantidad,
         ValorVenta: productoActual.ValorVenta,
@@ -311,6 +325,7 @@ const Home = ({ navigation }) => {
     const parametros = {
       IdDisenio,
       IdInsumo,
+      IdUsuario: 1,
       Referencia: Referencia.trim(),
       Cantidad: parseInt(Cantidad, 10),
       ValorVenta: parseFloat(ValorVenta),
@@ -369,6 +384,16 @@ const Home = ({ navigation }) => {
       setConfirmDeleteVisible(false);
       setDeleteId(null);
     }
+  };
+
+  const openImageModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setImageModalVisible(true);
+  };
+
+  const closeImageModal = () => {
+    setImageModalVisible(false);
+    setSelectedImage(null);
   };
 
   const filteredItems = productosAdmin.filter((producto) => {
@@ -690,27 +715,48 @@ const Home = ({ navigation }) => {
                 </Text>
                 <Text style={styles.modalItemText}>
                   Imagen Diseño:{" "}
-                  <Image
-                    source={{
-                      uri:
+                  <Pressable
+                    onPress={() =>
+                      openImageModal(
                         Disenios.find(
                           (d) => d.IdDisenio === productoDetalle.IdDisenio,
                         )?.ImagenDisenio || "",
-                    }}
-                    style={styles.image}
-                  />
+                      )
+                    }
+                  >
+                    <Image
+                      source={{
+                        uri:
+                          Disenios.find(
+                            (d) => d.IdDisenio === productoDetalle.IdDisenio,
+                          )?.ImagenDisenio || "",
+                      }}
+                      style={styles.image}
+                    />
+                  </Pressable>
                 </Text>
+
                 <Text style={styles.modalItemText}>
                   Imagen Referencia:{" "}
-                  <Image
-                    source={{
-                      uri:
+                  <Pressable
+                    onPress={() =>
+                      openImageModal(
                         Disenios.find(
                           (d) => d.IdDisenio === productoDetalle.IdDisenio,
                         )?.ImagenReferencia || "",
-                    }}
-                    style={styles.image}
-                  />
+                      )
+                    }
+                  >
+                    <Image
+                      source={{
+                        uri:
+                          Disenios.find(
+                            (d) => d.IdDisenio === productoDetalle.IdDisenio,
+                          )?.ImagenReferencia || "",
+                      }}
+                      style={styles.image}
+                    />
+                  </Pressable>
                 </Text>
               </View>
             )}
@@ -774,6 +820,20 @@ const Home = ({ navigation }) => {
           </Pressable>
         </View>
       </Modal>
+      <Modal
+        visible={imageModalVisible}
+        transparent={true}
+        onRequestClose={closeImageModal}
+      >
+        <Pressable style={styles.modalContainer} onPress={closeImageModal}>
+          <Image
+            source={{ uri: selectedImage }}
+            style={styles.fullImage}
+            resizeMode="contain"
+          />
+        </Pressable>
+      </Modal>
+
       <LogoutConfirmation navigation={navigation} />
     </View>
   );
@@ -948,6 +1008,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
+  },
+  fullImage: {
+    width: "80%",
+    height: "100%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 1,
   },
 });
 

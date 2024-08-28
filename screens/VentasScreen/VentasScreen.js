@@ -211,6 +211,10 @@ const VentasScreen = () => {
                 <Text style={styles.detailText}>
                   {clientes[pedidoSeleccionado.IdCliente] || "Desconocido"}
                 </Text>
+                <Text style={styles.detailHeaderText}>Método de pago:</Text>
+                <Text style={styles.detailText}>
+                  {pedidoSeleccionado.TipoPago || "Desconocido"}
+                </Text>
                 <Text style={styles.detailHeaderText}>Fecha:</Text>
                 <Text style={styles.detailText}>
                   {new Date(pedidoSeleccionado.Fecha).toLocaleDateString()}
@@ -218,6 +222,12 @@ const VentasScreen = () => {
                 <Text style={styles.detailHeaderText}>Total:</Text>
                 <Text style={styles.detailText}>
                   {formatPrice(pedidoSeleccionado.Total)}
+                </Text>
+
+                <Text style={styles.detailHeaderText}>Estado:</Text>
+                <Text style={styles.detailText}>
+                  {estadosPedidos[pedidoSeleccionado.IdEstadoPedido] ||
+                    "Desconocido"}
                 </Text>
 
                 <FlatList
@@ -373,18 +383,18 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     backgroundColor: "#01c05f",
-    padding: 5,
-    borderRadius: 15,
-    width: 30,
-    height: 30,
+    borderRadius: 30,
+    width: 30, // Aumenta el ancho
+    height: 30, // Aumenta la altura
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1, // Asegura que el botón esté por encima de otros elementos
   },
   closeButtonText: {
     color: "white",
-    fontSize: 12,
+    fontSize: 12, // Aumenta el tamaño de fuente si es necesario
     fontWeight: "bold",
-    textAlign: "center", // Alinea el texto al centro
+    textAlign: "center",
   },
   detailContainer: {
     marginBottom: 20,

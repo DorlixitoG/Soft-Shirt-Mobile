@@ -284,18 +284,18 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     backgroundColor: "#01c05f",
-    padding: 5,
-    borderRadius: 15,
-    width: 30,
-    height: 30,
+    borderRadius: 30,
+    width: 30, // Aumenta el ancho
+    height: 30, // Aumenta la altura
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1, // Asegura que el botón esté por encima de otros elementos
   },
   closeButtonText: {
     color: "white",
-    fontSize: 12,
+    fontSize: 12, // Aumenta el tamaño de fuente si es necesario
     fontWeight: "bold",
-    textAlign: "center", // Alinea el texto al centro
+    textAlign: "center",
   },
   detailContainer: {
     marginBottom: 20,
