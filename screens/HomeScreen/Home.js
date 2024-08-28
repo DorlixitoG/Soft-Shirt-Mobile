@@ -188,10 +188,6 @@ const Home = ({ navigation }) => {
         IdProducto: IdProducto,
         IdDisenio: productoActual.IdDisenio,
         IdInsumo: productoActual.IdInsumo,
-        IdUsuario: productoActual.IdUsuario,
-        Referencia: productoActual.Referencia,
-        Cantidad: productoActual.Cantidad,
-        ValorVenta: productoActual.ValorVenta,
         Publicacion: nuevoEstadoPublicacion,
         Estado: nuevoEstadoProducto,
       };
@@ -258,16 +254,12 @@ const Home = ({ navigation }) => {
         IdProducto: IdProducto,
         IdDisenio: productoActual.IdDisenio,
         IdInsumo: productoActual.IdInsumo,
-        IdUsuario: productoActual.IdUsuario,
-        Referencia: productoActual.Referencia,
-        Cantidad: productoActual.Cantidad,
-        ValorVenta: productoActual.ValorVenta,
         Estado: productoActual.Estado,
         Publicacion: nuevoEstado, // Actualiza el estado de publicación
       };
 
       const response = await axios.put(
-        `${url}/${IdProducto}`,
+        `${url}/${IdProducto}`, 
         parametrosProducto,
       );
 
@@ -298,6 +290,14 @@ const Home = ({ navigation }) => {
       setAlertTitle("Error");
       setAlertMessage(
         "La cantidad de productos no puede ser mayor que la cantidad de insumos disponibles",
+      );
+      setAlertVisible(true);
+      return;
+    }
+    if (parseInt(Cantidad, 10) < insumoSeleccionado?.Cantidad) {
+      setAlertTitle("Error");
+      setAlertMessage(
+        "La cantidad de productos no puede ser menor que la cantidad de insumos disponibles",
       );
       setAlertVisible(true);
       return;
@@ -593,6 +593,8 @@ const Home = ({ navigation }) => {
             onChangeText={(text) => setValorVenta(text.replace(/[^0-9.]/g, ""))} // Permitir solo números y decimales
             style={styles.input}
             keyboardType="numeric"
+            editable={operation !== 2} // Deshabilitar si es edición
+
           />
 
           <View style={styles.buttonContainer}>
