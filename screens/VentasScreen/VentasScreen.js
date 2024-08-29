@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TextInput,
   Image,
+  RefreshControl,
 } from "react-native";
 import axios from "axios";
 import AwesomeAlert from "react-native-awesome-alerts";
@@ -36,6 +37,8 @@ const VentasScreen = () => {
   const [comprobanteVisible, setComprobanteVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [comprobanteImageUri, setComprobanteImageUri] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
   // Efecto para obtener datos al montar el componente
   useEffect(() => {
     getPedidos();
@@ -120,6 +123,12 @@ const VentasScreen = () => {
     return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getPedidos();
+    setRefreshing(false);
+  };
+
   // Filtrar pedidos según término de búsqueda
   // Filtrar pedidos según término de búsqueda
   const filterPedidos = (pedido) => {
@@ -189,6 +198,9 @@ const VentasScreen = () => {
         data={pedidos.filter(filterPedidos)}
         keyExtractor={(item) => item.IdPedido.toString()}
         renderItem={renderItem}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
 
       <Modal
@@ -432,10 +444,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   searchInput: {
+    width: "100%",
+    padding: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 16,
     backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 15,
   },
   toggleButton: {
     backgroundColor: "#4bc1d2",

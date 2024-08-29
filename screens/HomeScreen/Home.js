@@ -10,6 +10,7 @@ import {
   Image,
   ScrollView,
   Switch,
+  RefreshControl,
 } from "react-native";
 import axios from "axios";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -53,6 +54,9 @@ const Home = ({ navigation }) => {
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [cantidadActual, setCantidadActual] = useState(null); // Estado para almacenar la cantidad actual
+  const [placeholderCantidad, setPlaceholderCantidad] = useState("Cantidad"); // Valor por defecto para el placeholder
 
   // Efecto para obtener datos al cargar el componente
 
@@ -62,7 +66,8 @@ const Home = ({ navigation }) => {
     getInsumos();
     getColores();
     getTallas();
-  }, []);
+    setValorVenta(calcularPrecioSugerido());
+  }, [IdInsumo, IdDisenio]);
 
   // Funciones para obtener datos desde la API
 
@@ -151,6 +156,7 @@ const Home = ({ navigation }) => {
     setIdInsumo(producto.IdInsumo || "");
     setReferencia(producto.Referencia || "");
     setCantidad(producto.Cantidad ? producto.Cantidad.toString() : ""); // Convertir a string
+    setCantidadActual(producto.Cantidad || null); // Guardar la cantidad actual del producto
     setValorVenta(producto.ValorVenta ? producto.ValorVenta.toString() : ""); // Convertir a string
     setTitle(op === 1 ? "Registrar Producto" : "Editar Producto");
     setOperation(op); // Establece el valor correcto para la operación
@@ -259,7 +265,7 @@ const Home = ({ navigation }) => {
       };
 
       const response = await axios.put(
-        `${url}/${IdProducto}`, 
+        `${url}/${IdProducto}`,
         parametrosProducto,
       );
 
@@ -285,19 +291,21 @@ const Home = ({ navigation }) => {
   const validar = () => {
     const insumoSeleccionado = Insumos.find((i) => i.IdInsumo === IdInsumo);
 
-    // Validar cantidad
-    if (parseInt(Cantidad, 10) > insumoSeleccionado?.Cantidad) {
+    // Validar cantidad ingresada solo si es una edición (operation === 2)
+    if (operation === 2 && parseInt(Cantidad, 10) < cantidadActual) {
       setAlertTitle("Error");
       setAlertMessage(
-        "La cantidad de productos no puede ser mayor que la cantidad de insumos disponibles",
+        `La cantidad ingresada (${Cantidad}) no puede ser menor que la cantidad actual (${cantidadActual}).`,
       );
       setAlertVisible(true);
       return;
     }
-    if (parseInt(Cantidad, 10) < insumoSeleccionado?.Cantidad) {
+
+    // Validar si la cantidad es mayor que la cantidad de insumos disponibles
+    if (parseInt(Cantidad, 10) > insumoSeleccionado?.Cantidad) {
       setAlertTitle("Error");
       setAlertMessage(
-        "La cantidad de productos no puede ser menor que la cantidad de insumos disponibles",
+        "La cantidad de productos no puede ser mayor que la cantidad de insumos disponibles",
       );
       setAlertVisible(true);
       return;
@@ -394,6 +402,37 @@ const Home = ({ navigation }) => {
   const closeImageModal = () => {
     setImageModalVisible(false);
     setSelectedImage(null);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getProductosAdmin();
+    setRefreshing(false);
+  };
+
+  const handleInsumoSelect = (insumoId) => {
+    const insumo = Insumos.find((insumo) => insumo.IdInsumo === insumoId);
+    if (insumo) {
+      setCantidadActual(insumo.Cantidad); // Actualiza la cantidad actual
+      setPlaceholderCantidad(`Cantidad disponible: ${insumo.Cantidad}`); // Establece el placeholder con la cantidad
+    } else {
+      setPlaceholderCantidad("Cantidad"); // Restablece el placeholder si no hay insumo seleccionado
+    }
+  };
+
+  const calcularPrecioSugerido = () => {
+    const insumoSeleccionado = Insumos.find((i) => i.IdInsumo === IdInsumo);
+    const disenioSeleccionado = Disenios.find((d) => d.IdDisenio === IdDisenio);
+
+    if (insumoSeleccionado && disenioSeleccionado) {
+      const precioInsumo = parseFloat(insumoSeleccionado.ValorCompra) || 0;
+      const precioDisenio = parseFloat(disenioSeleccionado.ValorCompra) || 0;
+      const precioTotal = precioInsumo + precioDisenio;
+      const precioConMargen = precioTotal * 1.03; // Añadir margen del 3%
+      return precioConMargen.toFixed(2); // Redondear a dos decimales
+    }
+
+    return ""; // Valor por defecto si no hay selección
   };
 
   const filteredItems = productosAdmin.filter((producto) => {
@@ -504,118 +543,99 @@ const Home = ({ navigation }) => {
         keyExtractor={(item) => item.IdProducto.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
-
-      <AwesomeAlert
-        show={alertVisible}
-        title={alertTitle}
-        message={alertMessage}
-        closeOnTouchOutside={false}
-        showConfirmButton={true}
-        confirmText="OK"
-        confirmButtonColor="#01c05f"
-        onConfirmPressed={() => setAlertVisible(false)}
-      />
-      <AwesomeAlert
-        show={confirmDeleteVisible}
-        showProgress={false}
-        title="Confirmar Eliminación"
-        message="¿Estás seguro de que deseas eliminar esta talla?"
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-        showCancelButton={true}
-        showConfirmButton={true}
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        confirmButtonColor="#01c05f"
-        cancelButtonColor="#01c05f"
-        onConfirmPressed={deleteTalla}
-        onCancelPressed={() => {
-          setConfirmDeleteVisible(false);
-          setDeleteId(null);
-        }}
-        contentContainerStyle={{ zIndex: 20 }}
-      />
-
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>{title}</Text>
-          <Picker
-            selectedValue={IdDisenio}
-            onValueChange={(itemValue) => setIdDisenio(itemValue)}
-            style={styles.picker}
-            enabled={operation !== 2} // Deshabilitar si es edición
-          >
-            <Picker.Item label="Selecciona diseño" value="" />
-            {Disenios.map((disenio) => (
-              <Picker.Item
-                key={disenio.IdDisenio}
-                label={disenio.NombreDisenio}
-                value={disenio.IdDisenio}
-              />
-            ))}
-          </Picker>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{title}</Text>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={IdDisenio}
+                onValueChange={(itemValue) => setIdDisenio(itemValue)}
+                style={styles.picker}
+                enabled={operation !== 2} // Deshabilitar si es edición
+              >
+                <Picker.Item label="Selecciona diseño" value="" />
+                {Disenios.map((disenio) => (
+                  <Picker.Item
+                    key={disenio.IdDisenio}
+                    label={disenio.NombreDisenio}
+                    value={disenio.IdDisenio}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={IdInsumo}
+                onValueChange={(itemValue) => {
+                  setIdInsumo(itemValue);
+                  handleInsumoSelect(itemValue);
+                }}
+                style={styles.picker}
+                enabled={operation !== 2} // Deshabilitar si es edición
+              >
+                <Picker.Item label="Selecciona insumo" value="" />
+                {Insumos.map((insumo) => (
+                  <Picker.Item
+                    key={insumo.IdInsumo}
+                    label={insumo.Referencia}
+                    value={insumo.IdInsumo}
+                  />
+                ))}
+              </Picker>
+            </View>
 
-          <Picker
-            selectedValue={IdInsumo}
-            onValueChange={(itemValue) => setIdInsumo(itemValue)}
-            style={styles.picker}
-            enabled={operation !== 2} // Deshabilitar si es edición
-          >
-            <Picker.Item label="Selecciona insumo" value="" />
-            {Insumos.map((insumo) => (
-              <Picker.Item
-                key={insumo.IdInsumo}
-                label={insumo.Referencia}
-                value={insumo.IdInsumo}
-              />
-            ))}
-          </Picker>
+            <TextInput
+              placeholder="Referencia del Producto (AAA-000)"
+              value={Referencia}
+              onChangeText={setReferencia}
+              style={styles.input}
+              maxLength={7} // Limitar la longitud del texto a 7 caracteres
+              editable={operation !== 2} // Deshabilitar si es edición
+            />
+            <TextInput
+              style={styles.input}
+              placeholder={placeholderCantidad}
+              value={Cantidad}
+              onChangeText={setCantidad}
+              keyboardType="numeric"
+            />
 
-          <TextInput
-            placeholder="Referencia del Producto (AAA-000)"
-            value={Referencia}
-            onChangeText={setReferencia}
-            style={styles.input}
-            maxLength={7} // Limitar la longitud del texto a 7 caracteres
-            editable={operation !== 2} // Deshabilitar si es edición
-          />
-          <TextInput
-            placeholder="Cantidad"
-            value={Cantidad}
-            onChangeText={(text) => setCantidad(text.replace(/[^0-9]/g, ""))} // Permitir solo números enteros
-            style={styles.input}
-            keyboardType="numeric"
-          />
-          <TextInput
-            placeholder="Valor de Venta"
-            value={ValorVenta}
-            onChangeText={(text) => setValorVenta(text.replace(/[^0-9.]/g, ""))} // Permitir solo números y decimales
-            style={styles.input}
-            keyboardType="numeric"
-            editable={operation !== 2} // Deshabilitar si es edición
+            <TextInput
+              placeholder="Valor de venta"
+              value={ValorVenta || calcularPrecioSugerido()}
+              onChangeText={(text) =>
+                setValorVenta(text.replace(/[^0-9.]/g, ""))
+              } // Permitir solo números y decimales
+              style={styles.input}
+              keyboardType="numeric"
+              editable={operation !== 2} // Deshabilitar si es edición
+            />
 
-          />
-
-          <View style={styles.buttonContainer}>
-            <Pressable
-              style={[styles.button, styles.saveButton]}
-              onPress={validar}
-            >
-              <Text style={styles.buttonText}>Guardar</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.button, styles.cancelButton]}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.buttonText}>Cancelar</Text>
-            </Pressable>
+            <View style={styles.buttonContainer}>
+              <Pressable
+                style={[styles.button, styles.saveButton]}
+                onPress={validar}
+              >
+                <Text style={styles.buttonText}>Guardar</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
+
       <Modal visible={detalleVisible} animationType="slide" transparent={true}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Detalles del Producto</Text>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             {/* Agrega ScrollView */}
             <Pressable
@@ -649,7 +669,7 @@ const Home = ({ navigation }) => {
                   Cantidad: {productoDetalle.Cantidad}
                 </Text>
                 <Text style={styles.modalItemText}>
-                  Valor de la Venta: {productoDetalle.ValorVenta}
+                  Valor de la Venta: {formatPrice(productoDetalle.ValorVenta)}
                 </Text>
               </View>
             )}
@@ -672,30 +692,6 @@ const Home = ({ navigation }) => {
                   {Disenios.find(
                     (d) => d.IdDisenio === productoDetalle.IdDisenio,
                   )?.NombreDisenio || "No disponible"}
-                </Text>
-                <Text style={styles.modalItemText}>
-                  Fuente:{" "}
-                  {Disenios.find(
-                    (d) => d.IdDisenio === productoDetalle.IdDisenio,
-                  )?.Fuente || "No disponible"}
-                </Text>
-                <Text style={styles.modalItemText}>
-                  Tamaño de Fuente:{" "}
-                  {Disenios.find(
-                    (d) => d.IdDisenio === productoDetalle.IdDisenio,
-                  )?.TamanioFuente || "No disponible"}
-                </Text>
-                <Text style={styles.modalItemText}>
-                  Color de Fuente:{" "}
-                  {Disenios.find(
-                    (d) => d.IdDisenio === productoDetalle.IdDisenio,
-                  )?.ColorFuente || "No disponible"}
-                </Text>
-                <Text style={styles.modalItemText}>
-                  Posición de Fuente:{" "}
-                  {Disenios.find(
-                    (d) => d.IdDisenio === productoDetalle.IdDisenio,
-                  )?.PosicionFuente || "No disponible"}
                 </Text>
                 <Text style={styles.modalItemText}>
                   Tamaño de Imagen:{" "}
@@ -766,7 +762,7 @@ const Home = ({ navigation }) => {
               onPress={toggleInsumoAccordion}
               style={styles.accordionHeader}
             >
-              <Text style={styles.accordionTitle}>Insumo</Text>
+              <Text style={styles.accordionTitle}>Detalles del Insumo</Text>
               <Icon
                 name={insumoExpanded ? "chevron-up" : "chevron-down"}
                 size={20}
@@ -815,10 +811,10 @@ const Home = ({ navigation }) => {
           </ScrollView>
 
           <Pressable
-            style={styles.button}
             onPress={() => setDetalleVisible(false)}
+            style={styles.closeButton}
           >
-            <Text style={styles.buttonText}>Cerrar</Text>
+            <Icon name="times" size={20} color="#fff" />
           </Pressable>
         </View>
       </Modal>
@@ -835,6 +831,36 @@ const Home = ({ navigation }) => {
           />
         </Pressable>
       </Modal>
+      <AwesomeAlert
+        show={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        closeOnTouchOutside={false}
+        showConfirmButton={true}
+        confirmText="OK"
+        confirmButtonColor="#01c05f"
+        onConfirmPressed={() => setAlertVisible(false)}
+      />
+      <AwesomeAlert
+        show={confirmDeleteVisible}
+        showProgress={false}
+        title="Confirmar Eliminación"
+        message="¿Estás seguro de que deseas eliminar esta talla?"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        showConfirmButton={true}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        confirmButtonColor="#01c05f"
+        cancelButtonColor="#01c05f"
+        onConfirmPressed={deleteTalla}
+        onCancelPressed={() => {
+          setConfirmDeleteVisible(false);
+          setDeleteId(null);
+        }}
+        contentContainerStyle={{ zIndex: 20 }}
+      />
 
       <LogoutConfirmation navigation={navigation} />
     </View>
@@ -907,7 +933,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: "#fff",
-    fontSize: 16,
+    fontWeight: "bold",
   },
   flatListContent: {
     flexGrow: 1,
@@ -929,27 +955,43 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: 15,
+    backgroundColor: "rgba(0,0,0,0.5)", // Fondo oscuro con opacidad
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 16,
-    color: "#fff",
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 5,
-    width: "80%",
     marginBottom: 10,
+  },
+  pickerContainer: {
+    width: "100%", // Asegúrate de que el contenedor tenga el ancho adecuado
+    borderColor: "#ccc", // Color del borde
+    borderWidth: 1, // Ancho del borde
+    borderRadius: 5, // Opcional: redondear las esquinas del borde
+    marginBottom: 20, // Espaciado opcional
   },
   picker: {
-    backgroundColor: "#fff",
-    marginBottom: 10,
-    height: 50, // Asegúrate de que la altura sea la misma que la del TextInput
-    width: "80%", // Asegúrate de que el ancho sea el mismo que el del TextInput
+    height: 50,
+    width: "100%", // Asegúrate de que el Picker ocupe todo el ancho del contenedor
+  },
+  input: {
+    width: "100%", // Asegúrate de que el Input ocupe el mismo ancho
+    height: 50,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20, // Espaciado opcional
   },
   buttonContainer: {
     flexDirection: "row",
@@ -957,40 +999,57 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   button: {
-    backgroundColor: "#01c05f",
+    flex: 1,
     padding: 10,
     borderRadius: 5,
-    width: "48%",
+    margin: 5,
     alignItems: "center",
   },
   saveButton: {
-    backgroundColor: "#01c05f",
+    backgroundColor: "#4CAF50", // Verde para guardar
   },
   cancelButton: {
-    backgroundColor: "gray",
+    backgroundColor: "gray", // Rojo para cancelar
   },
+
   modalItemText: {
-    fontSize: 18, // Cambia el tamaño de la fuente según lo necesites
-    color: "#fff", // Cambia el color de la fuente según lo necesites
-    marginBottom: 8, // Espaciado entre líneas
+    fontSize: 14,
+    marginBottom: 5,
   },
   accordionHeader: {
-    flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    alignItems: "center",
+    padding: 15,
     backgroundColor: "#01c05f",
     borderRadius: 5,
-    marginBottom: 15,
+    marginBottom: 5,
+  },
+  accordionItem: {
+    marginBottom: 10,
+    padding: 10,
+    borderBottomColor: "#ddd",
   },
   accordionTitle: {
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: "bold",
     color: "#fff",
   },
   accordionContent: {
-    padding: 10,
-    backgroundColor: "#444",
+    backgroundColor: "#fff",
     borderRadius: 5,
-    marginBottom: 10, // Añadir margen inferior
+    padding: 10,
+    marginBottom: 10,
+    width: "100%",
+  },
+  accordionContainer: {
+    // Nuevo estilo para centrar el acordeón
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    marginTop: 50, // Ajusta el margen para desplazar el contenido hacia abajo
+  },
+  scrollViewContent: {
+    paddingVertical: 20,
   },
   image: {
     width: 30, // Ajusta según sea necesario

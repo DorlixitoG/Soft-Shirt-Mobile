@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
   TextInput,
+  RefreshControl,
 } from "react-native";
 import axios from "axios";
 import AwesomeAlert from "react-native-awesome-alerts";
@@ -29,6 +30,7 @@ const ComprasScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   // Efecto para obtener datos al montar el componente
   useEffect(() => {
@@ -96,6 +98,12 @@ const ComprasScreen = () => {
     return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getCompras();
+    setRefreshing(false);
+  };
+
   // Filtrar compras según término de búsqueda
   const filterCompras = (compra) => {
     const proveedor = proveedores[compra.IdProveedor] || "";
@@ -157,6 +165,9 @@ const ComprasScreen = () => {
         data={compras.filter(filterCompras)}
         keyExtractor={(item) => item.IdCompra.toString()}
         renderItem={renderItem}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
 
       <Modal
