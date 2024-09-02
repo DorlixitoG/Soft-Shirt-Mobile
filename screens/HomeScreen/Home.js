@@ -155,11 +155,13 @@ const Home = ({ navigation }) => {
     setIdDisenio(producto.IdDisenio || "");
     setIdInsumo(producto.IdInsumo || "");
     setReferencia(producto.Referencia || "");
-    setCantidad(producto.Cantidad ? producto.Cantidad.toString() : ""); // Convertir a string
-    setCantidadActual(producto.Cantidad || null); // Guardar la cantidad actual del producto
-    setValorVenta(producto.ValorVenta ? producto.ValorVenta.toString() : ""); // Convertir a string
+    setCantidad(producto.Cantidad ? producto.Cantidad.toString() : "");
+    setCantidadActual(producto.Cantidad || null);
+    setValorVenta(producto.ValorVenta ? producto.ValorVenta.toString() : "");
     setTitle(op === 1 ? "Registrar Producto" : "Editar Producto");
-    setOperation(op); // Establece el valor correcto para la operación
+    setOperation(op);
+    setPlaceholderCantidad("Cantidad");
+    setAlertMessage("");
     setModalVisible(true);
   };
 
@@ -411,12 +413,18 @@ const Home = ({ navigation }) => {
   };
 
   const handleInsumoSelect = (insumoId) => {
-    const insumo = Insumos.find((insumo) => insumo.IdInsumo === insumoId);
-    if (insumo) {
-      setCantidadActual(insumo.Cantidad); // Actualiza la cantidad actual
-      setPlaceholderCantidad(`Cantidad disponible: ${insumo.Cantidad}`); // Establece el placeholder con la cantidad
+    const insumoSeleccionado = Insumos.find(
+      (insumo) => insumo.IdInsumo === insumoId,
+    );
+    if (insumoSeleccionado) {
+      setCantidadActual(insumoSeleccionado.Cantidad); // Actualiza la cantidad actual
+      setPlaceholderCantidad(
+        `Cantidad disponible: ${insumoSeleccionado.Cantidad}`,
+      ); // Establece el placeholder con la cantidad
     } else {
-      setPlaceholderCantidad("Cantidad"); // Restablece el placeholder si no hay insumo seleccionado
+      setCantidadActual(null);
+      setCantidad("");
+      setPlaceholderCantidad("Cantidad");
     }
   };
 
@@ -426,10 +434,11 @@ const Home = ({ navigation }) => {
 
     if (insumoSeleccionado && disenioSeleccionado) {
       const precioInsumo = parseFloat(insumoSeleccionado.ValorCompra) || 0;
-      const precioDisenio = parseFloat(disenioSeleccionado.ValorCompra) || 0;
-      const precioTotal = precioInsumo + precioDisenio;
-      const precioConMargen = precioTotal * 1.03; // Añadir margen del 3%
-      return precioConMargen.toFixed(2); // Redondear a dos decimales
+      const precioDisenio = parseFloat(disenioSeleccionado.PrecioDisenio) || 0;
+      const subTotal = precioInsumo + precioDisenio;
+      const margen = subTotal * 0.3;
+      const total = subTotal + margen;
+      return total.toFixed(2); // Redondear a dos decimales
     }
 
     return ""; // Valor por defecto si no hay selección
@@ -1006,10 +1015,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveButton: {
-    backgroundColor: "#4CAF50", // Verde para guardar
+    backgroundColor: "#01c05f",
   },
   cancelButton: {
-    backgroundColor: "gray", // Rojo para cancelar
+    backgroundColor: "gray",
   },
 
   modalItemText: {
