@@ -15,22 +15,18 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import AwesomeAlert from "react-native-awesome-alerts";
 import LogoutConfirmation from "../../components/LogoutConfirmation";
+import { ColorPicker } from "react-native-color-picker";
+import Slider from "@react-native-community/slider";
 
-const Home = ({ navigation }) => {
-  const url = "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos";
+const ColoresScreen = ({ navigation }) => {
+  const url = "https://back-end1-9e2f0d364f68.herokuapp.com/api/colores";
 
   // Estados para manejar datos y UI
 
-  const [Insumos, setInsumos] = useState([]);
-  const [Disenios, setDisenios] = useState([]);
   const [Colores, setColores] = useState([]);
-  const [Tallas, setTallas] = useState([]);
-  const [IdInsumo, setIdInsumo] = useState("");
   const [IdColor, setIdColor] = useState("");
-  const [IdTalla, setIdTalla] = useState("");
+  const [Color, setColor] = useState("");
   const [Referencia, setReferencia] = useState("");
-  const [Cantidad, setCantidad] = useState("");
-  const [ValorCompra, setValorCompra] = useState("");
   const [title, setTitle] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
@@ -43,80 +39,34 @@ const Home = ({ navigation }) => {
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [placeholderCantidad, setPlaceholderCantidad] = useState("Cantidad"); // Valor por defecto para el placeholder
+  const [selectedColor, setSelectedColor] = useState("");
 
   // Efecto para obtener datos al cargar el componente
 
   useEffect(() => {
-    getInsumos();
-    getDisenios();
     getColores();
-    getTallas();
-  }, [IdInsumo, IdColor]);
+  }, []);
 
   // Funciones para obtener datos desde la API
-
-  const getInsumos = async () => {
-    try {
-      const respuesta = await axios.get(url);
-      setInsumos(respuesta.data);
-      console.log(respuesta.data);
-    } catch (error) {
-      console.error("Error al obtener los insumos:", error);
-    }
-  };
-
-  const getDisenios = async () => {
-    try {
-      const respuesta = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/disenios",
-      );
-      const DiseniosActivos = respuesta.data.filter(
-        (disenio) => disenio.Estado === "Activo",
-      );
-      console.log(DiseniosActivos);
-      setDisenios(DiseniosActivos);
-    } catch (error) {
-      console.error("Error al obtener los diseños:", error);
-    }
-  };
 
   const getColores = async () => {
     try {
       const respuesta = await axios.get(
         "https://back-end1-9e2f0d364f68.herokuapp.com/api/colores",
       );
-      const coloresActivos = respuesta.data.filter(
-        (color) => color.Estado === "Activo",
-      );
-      setColores(coloresActivos);
+      console.log(respuesta.data); // Verifica los datos recibidos
+      setColores(respuesta.data);
     } catch (error) {
       console.error("Error al obtener los colores:", error);
     }
   };
 
-  const getTallas = async () => {
-    try {
-      const respuesta = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/tallas",
-      );
-      const tallasActivas = respuesta.data.filter(
-        (talla) => talla.Estado === "Activo",
-      );
-      setTallas(tallasActivas);
-    } catch (error) {
-      console.error("Error al obtener las tallas:", error);
-    }
-  };
-
-  const openModal = (op, insumo = {}) => {
-    if (insumo.Estado === "Inactivo") return; // Evitar abrir el modal si el producto está inactivo
-    setIdInsumo(insumo.IdInsumo || "");
-    setIdColor(insumo.IdColor || "");
-    setIdTalla(insumo.IdTalla || "");
-    setReferencia(insumo.Referencia || "");
-    setCantidad("0"); // Establece Cantidad en 0
-    setValorCompra("0"); // Establece ValorVenta en 0
-
+  const openModal = (op, color = {}) => {
+    if (color.Estado === "Inactivo") return; // Evitar abrir el modal si el producto está inactivo
+    setIdColor(color.IdColor || "");
+    setColor(color.Color || "");
+    setReferencia(color.Referencia || "");
+    setSelectedColor(color.Referencia || "#000000"); // Inicializa selectedColor con el valor de Referencia
     setTitle(op === 1 ? "Registrar Producto" : "Editar Producto");
     setOperation(op);
     setPlaceholderCantidad("Cantidad");
@@ -126,67 +76,58 @@ const Home = ({ navigation }) => {
 
   // Funciones de validación
 
-  // Función para validar la referencia
-  const validateReferencia = (value) => {
-    if (!value) {
-      return "Escribe la referencia";
-    }
-    // Validar que la referencia siga el patrón TST-001
-    // if (!/^[A-Z]{3}-\d{3}$/.test(value)) {
-    //   return "La referencia debe ser en el formato AAA-000";
-    // }
-    // return "";
-  };
   // Funciones para cambiar el estado y la publicación del producto
 
-  const cambiarEstado = async (IdInsumo) => {
+  const cambiarEstado = async (IdColor) => {
     try {
-      const insumoActual = Insumos.find(
-        (insumo) => insumo.IdInsumo === IdInsumo,
+      // Verifica si el color está asociado con algún insumo
+      const insumosResponse = await axios.get(
+        "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos",
       );
-      // Validar si la cantidad es mayor que 0
-      if (insumoActual.Cantidad > 0) {
-        setAlertTitle("Advertencia");
-        setAlertMessage(
-          "No se puede cambiar el estado porque la cantidad es mayor que 0.",
-        );
-        setAlertVisible(true);
-        return; // Detiene la ejecución si la cantidad es mayor a 0
-      }
-      const nuevoEstadoInsumo =
-        insumoActual.Estado === "Activo" ? "Inactivo" : "Activo";
 
-      const parametrosProducto = {
-        IdInsumo: IdInsumo,
-        IdColor: insumoActual.IdColor,
-        IdTalla: insumoActual.IdTalla,
-        Referencia: insumoActual.Referencia,
-        Cantidad: insumoActual.Cantidad,
-        ValorCompra: insumoActual.ValorCompra,
-        Estado: nuevoEstadoInsumo,
+      
+      const insumos = insumosResponse.data;
+
+      const colorActual = Colores.find((color) => color.IdColor === IdColor);
+      const nuevoEstadoColor =
+        colorActual.Estado === "Activo" ? "Inactivo" : "Activo";
+
+      // Verifica asociación con insumos antes de cambiar el estado
+      if (nuevoEstadoColor === "Inactivo") {
+        const asociadoConInsumos = insumos.some(
+          (insumo) => insumo.IdColor === IdColor,
+        );
+
+        if (asociadoConInsumos) {
+          setAlertTitle("Error");
+          setAlertMessage(
+            "No se puede cambiar el estado a 'Inactivo' porque el color está asociado con insumos.",
+          );
+          setAlertVisible(true);
+          return;
+        }
+      }
+
+      // Si pasa la validación, procede a cambiar el estado
+      const parametrosColor = {
+        IdColor: IdColor,
+        Color: colorActual.Color,
+        Referencia: colorActual.Referencia,
+        Estado: nuevoEstadoColor,
       };
 
-      console.log(
-        "Enviando parámetros para cambiar estado:",
-        parametrosProducto,
-      );
+      console.log("Enviando parámetros para cambiar estado:", parametrosColor);
 
-      const response = await axios.put(
-        `${url}/${IdInsumo}`,
-        parametrosProducto,
-      );
+      const response = await axios.put(`${url}/${IdColor}`, parametrosColor);
 
       console.log("Respuesta del backend para cambiar estado:", response.data);
 
       if (response.status === 200) {
-        setInsumos((prevInsumos) =>
-          prevInsumos.map((insumo) =>
-            insumo.IdInsumo === IdInsumo
-              ? {
-                  ...insumo,
-                  Estado: nuevoEstadoInsumo,
-                }
-              : insumo,
+        setColores((prevColores) =>
+          prevColores.map((color) =>
+            color.IdColor === IdColor
+              ? { ...color, Estado: nuevoEstadoColor }
+              : color,
           ),
         );
         setAlertTitle("Éxito");
@@ -194,10 +135,7 @@ const Home = ({ navigation }) => {
         setAlertVisible(true);
       }
     } catch (error) {
-      console.error(
-        "Error al cambiar estado y publicación:",
-        error.response?.data,
-      );
+      console.error("Error al cambiar estado:", error.response?.data);
       setAlertTitle("Error");
       setAlertMessage("Error al cambiar el estado");
       setAlertVisible(true);
@@ -206,34 +144,16 @@ const Home = ({ navigation }) => {
 
   const validar = () => {
     // Validar referencia
-    const referenciaError = validateReferencia(Referencia);
-    if (referenciaError) {
-      setAlertTitle("Advertencia");
-      setAlertMessage(referenciaError);
+    if (!Color.trim()) {
+      setAlertTitle("Error");
+      setAlertMessage("El campo Color es obligatorio.");
       setAlertVisible(true);
       return;
     }
-    const referenciaDuplicada = Insumos.some(
-      (insumo) =>
-        insumo.Referencia === Referencia && insumo.IdInsumo !== IdInsumo,
-    );
-
-    if (referenciaDuplicada) {
-      setAlertTitle("Error");
-      setAlertMessage(
-        "Ya existe un insumo con esta referencia, intenta de nuevo con otra",
-      );
-      setAlertVisible(true);
-      return; // Detener el proceso si se encuentra una referencia duplicada
-    }
-
     const parametros = {
-      IdColor,
-      IdTalla,
-      Referencia: Referencia.trim(),
-      Cantidad: parseInt(Cantidad, 10),
-      ValorCompra: parseFloat(ValorCompra),
-      IdInsumo, // Incluye IdInsumo para PUT
+      Color: Color.trim(),
+      Referencia: selectedColor,
+      IdColor, // Incluye IdInsumo para PUT
     };
 
     // Establece el método según la operación (1 = crear, 2 = editar)
@@ -247,25 +167,25 @@ const Home = ({ navigation }) => {
     try {
       setLoading(true);
       if (metodo === "PUT") {
-        // Para editar un insumo
+        // Para editar un color
         console.log("Enviando parámetros para PUT:", parametros);
-        await axios.put(`${url}/${parametros.IdInsumo}`, parametros);
+        await axios.put(`${url}/${parametros.IdColor}`, parametros);
         setAlertTitle("Éxito");
-        setAlertMessage("Insumo editado exitosamente");
+        setAlertMessage("color editado exitosamente");
       } else if (metodo === "POST") {
-        // Para crear un nuevo insumo
+        // Para crear un nuevo color
         console.log("Enviando parámetros para POST:", parametros);
         await axios.post(url, parametros);
         setAlertTitle("Éxito");
-        setAlertMessage("Insumo creado exitosamente");
+        setAlertMessage("color creado exitosamente");
       } else if (metodo === "DELETE") {
-        // Para eliminar un insumo
+        // Para eliminar un color
         console.log("Enviando parámetros para DELETE:", parametros);
-        await axios.delete(`${url}/${parametros.IdInsumo}`);
+        await axios.delete(`${url}/${parametros.IdColor}`);
         setAlertTitle("Éxito");
-        setAlertMessage("Insumo eliminado exitosamente");
+        setAlertMessage("color eliminado exitosamente");
       }
-      getInsumos(); // Obtén los insumos actualizados
+      getColores(); // Obtén los colore actualizados
       setModalVisible(false); // Cierra el modal
     } catch (error) {
       console.error("Error al enviar solicitud:", error.response?.data);
@@ -277,14 +197,14 @@ const Home = ({ navigation }) => {
     }
   };
 
-  const confirmDelete = (IdInsumo) => {
-    setDeleteId(IdInsumo);
+  const confirmDelete = (IdColor) => {
+    setDeleteId(IdColor);
     setConfirmDeleteVisible(true);
   };
 
   const deleteTalla = () => {
     if (deleteId !== null) {
-      enviarSolicitud("DELETE", { IdInsumo: deleteId });
+      enviarSolicitud("DELETE", { IdColor: deleteId });
       setConfirmDeleteVisible(false);
       setDeleteId(null);
     }
@@ -292,75 +212,33 @@ const Home = ({ navigation }) => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await getInsumos();
+    await getColores();
     setRefreshing(false);
   };
-  const updateReferencia = (colorId, tallaId) => {
-    const color = Colores.find((color) => color.IdColor === parseInt(colorId));
-    const talla = Tallas.find((talla) => talla.IdTalla === parseInt(tallaId));
-    if (color && talla) {
-      const colorHex = color.Referencia.substring(1, 4).toUpperCase();
-      const referenciaGenerada = `${talla.Talla}-${colorHex}`;
-      setReferencia(referenciaGenerada);
-    } else {
-      setReferencia("");
-    }
-  };
 
-  const handleChangeIdColor = (value) => {
-    setIdColor(value);
-
-    updateReferencia(value, IdTalla); // Llama a updateReferencia al cambiar el color
-  };
-
-  const handleChangeIdTalla = (value) => {
-    setIdTalla(value);
-    updateReferencia(IdColor, value); // Llama a updateReferencia al cambiar la talla
-  };
-
-  const filteredItems = Insumos.filter((producto) => {
-    const color = Colores.find((c) => c.IdColor === producto.IdColor);
-    const talla = Tallas.find((t) => t.IdTalla === producto.IdTalla);
-
+  const filteredItems = Colores.filter((color) => {
     return (
-      producto.Referencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      producto.Cantidad.toString().includes(searchTerm) ||
-      producto.ValorCompra.toString().includes(searchTerm) ||
-      producto.Estado.toString().includes(searchTerm) ||
-      color.Color.toLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-      talla.Talla.toLowerCase().includes(searchTerm.toLowerCase())
+      color.Color.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      color.Referencia.toString().includes(searchTerm) ||
+      color.Estado.toString().includes(searchTerm)
     );
   });
-
-  const formatPrice = (price) => {
-    const formattedPrice = parseFloat(price).toLocaleString("es-ES", {
-      style: "decimal",
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    });
-    return `$${formattedPrice} COP`;
-  };
 
   // Renderizado de cada insumos en la lista
 
   const renderItem = ({ item }) => {
-    const color = Colores.find((c) => c.IdColor === item.IdColor);
-    const talla = Tallas.find((t) => t.IdTalla === item.IdTalla);
     return (
       <View style={styles.item}>
         <View style={styles.itemContent}>
           <View style={styles.itemDetails}>
-            <Text style={styles.itemText}>Referencia: {item.Referencia}</Text>
-            <Text style={styles.itemText}>
-              Color: {color ? color.Color : "No disponible"}
-            </Text>
-            <Text style={styles.itemText}>
-              Talla: {talla ? talla.Talla : "No disponible"}
-            </Text>
-            <Text style={styles.itemText}>Cantidad: {item.Cantidad}</Text>
-            <Text style={styles.itemText}>
-              Valor Compra: {formatPrice(item.ValorCompra)}
-            </Text>
+            <Text style={styles.itemText}>Color: {item.Color}</Text>
+            <Text style={styles.itemText}>Referencia: </Text>
+            <View
+              style={[
+                styles.colorBox,
+                { backgroundColor: item.Referencia }, // Se asigna el valor hexadecimal
+              ]}
+            />
           </View>
           <View style={styles.buttonsContainer}>
             <Pressable
@@ -373,27 +251,24 @@ const Home = ({ navigation }) => {
             >
               <Icon name="pencil" size={20} color="#fff" />
             </Pressable>
-            {/* Solo mostrar el botón de eliminar si la cantidad es 0 */}
-            {item.Cantidad === 0 && (
-              <Pressable
-                onPress={() =>
-                  item.Estado !== "Inactivo" && confirmDelete(item.IdInsumo)
-                }
-                style={[
-                  styles.deleteButton,
-                  { opacity: item.Estado === "Inactivo" ? 0.5 : 1 },
-                ]}
-                disabled={item.Estado === "Inactivo"}
-              >
-                <Icon name="trash" size={20} color="#fff" />
-              </Pressable>
-            )}
+            <Pressable
+              onPress={() =>
+                item.Estado !== "Inactivo" && confirmDelete(item.IdColor)
+              }
+              style={[
+                styles.deleteButton,
+                { opacity: item.Estado === "Inactivo" ? 0.5 : 1 },
+              ]}
+              disabled={item.Estado === "Inactivo"}
+            >
+              <Icon name="trash" size={20} color="#fff" />
+            </Pressable>
 
             <View style={styles.switchContainer}>
               <Text style={styles.switchLabel}>Estado</Text>
               <Switch
                 value={item.Estado === "Activo"}
-                onValueChange={() => cambiarEstado(item.IdInsumo)}
+                onValueChange={() => cambiarEstado(item.IdColor)}
               />
             </View>
           </View>
@@ -418,7 +293,7 @@ const Home = ({ navigation }) => {
 
       <FlatList
         data={filteredItems}
-        keyExtractor={(item) => item.IdInsumo.toString()}
+        keyExtractor={(item) => item.IdColor.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListContent}
         refreshControl={
@@ -429,66 +304,28 @@ const Home = ({ navigation }) => {
         <View style={styles.modalView}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{title}</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={IdColor}
-                onValueChange={handleChangeIdColor}
-                style={styles.picker}
-              >
-                <Picker.Item label="Selecciona un color" value="" />
-                {Colores.map((color) => (
-                  <Picker.Item
-                    key={color.IdColor}
-                    label={color.Color}
-                    value={color.IdColor}
-                  />
-                ))}
-              </Picker>
+            <TextInput
+              style={styles.input}
+              placeholder="Color"
+              value={Color}
+              onChangeText={setColor}
+            />
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ColorPicker
+                onColorSelected={(color) => {
+                  console.log("Color seleccionado:", color); // Agrega este log
+                  setSelectedColor(color);
+                }}
+                style={{ height: 200, width: 200 }}
+                defaultColor={selectedColor}
+                sliderComponent={Slider}
+              />
             </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={IdTalla}
-                onValueChange={handleChangeIdTalla}
-                style={styles.picker}
-              >
-                <Picker.Item label="Selecciona una talla" value="" />
-                {Tallas.map((talla) => (
-                  <Picker.Item
-                    key={talla.IdTalla}
-                    label={talla.Talla}
-                    value={talla.IdTalla}
-                  />
-                ))}
-              </Picker>
-            </View>
-
-            <TextInput
-              placeholder="Referencia"
-              value={Referencia}
-              onChangeText={setReferencia}
-              style={styles.input}
-              maxLength={7} // Limitar la longitud del texto a 7 caracteres
-              editable={false} // Deshabilitado siempre
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={placeholderCantidad}
-              value={Cantidad}
-              onChangeText={setCantidad}
-              keyboardType="numeric"
-              editable={false} // Deshabilitado siempre
-            />
-
-            <TextInput
-              placeholder="Valor de compra"
-              value={ValorCompra}
-              onChangeText={(text) =>
-                setValorCompra(text.replace(/[^0-9.]/g, ""))
-              } // Permitir solo números y decimales
-              style={styles.input}
-              keyboardType="numeric"
-              editable={false} // Deshabilitado siempre
-            />
 
             <View style={styles.buttonContainer}>
               <Pressable
@@ -576,6 +413,12 @@ const styles = StyleSheet.create({
   itemDetails: {
     flex: 1,
   },
+  colorBox: {
+    width: 80, // Ajusta el tamaño del cuadro de color
+    height: 60, // Ajusta el tamaño del cuadro de color
+    borderRadius: 5,
+    marginVertical: 5,
+  },
   createButton: {
     backgroundColor: "#01c05f",
     padding: 10,
@@ -612,7 +455,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   flatListContent: {
-    flexGrow: 1,
+    paddingBottom: 0, // Asegúrate de que no haya padding extra.
   },
   paginationContainer: {
     flexDirection: "row",
@@ -764,4 +607,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default ColoresScreen;

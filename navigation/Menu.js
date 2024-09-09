@@ -31,7 +31,7 @@ function CustomDrawerContent({
     getUserName();
   }, []);
 
-  const screens = ["Productos", "Compras", "Ventas"];
+  const screens = ["Insumos", "Colores", "Tallas", "Compras", "Ventas"];
 
   const handleLogout = async () => {
     try {

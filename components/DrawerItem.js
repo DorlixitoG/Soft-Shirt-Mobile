@@ -9,22 +9,42 @@ const DrawerItem = ({ navigation, title, focused = false, onPress }) => {
   const handlePress = () => {
     if (title === "Cerrar sesión") {
       if (onPress) onPress(); // Llamar a la función onPress para cerrar sesión
-    } else if (title === "Productos") {
+    } else if (title === "Insumos") {
       navigation.navigate("HomeScreen");
     } else if (title === "Compras") {
       navigation.navigate("ComprasScreen");
     } else if (title === "Ventas") {
       navigation.navigate("VentasScreen");
+    } else if (title === "Colores") {
+      navigation.navigate("ColoresScreen");
+    } else if (title === "Tallas") {
+      navigation.navigate("TallasScreen");
     }
   };
 
   // Renderiza el ícono correspondiente basado en el título
   const renderIcon = () => {
     switch (title) {
-      case "Productos":
+      case "Insumos":
         return (
           <Icon
-            name="shopping-bag"
+            name="archive"
+            size={16}
+            color={focused ? "white" : argonTheme.COLORS.PRIMARY}
+          />
+        );
+      case "Colores":
+        return (
+          <Icon
+            name="paint-brush"
+            size={16}
+            color={focused ? "white" : argonTheme.COLORS.PRIMARY}
+          />
+        );
+      case "Tallas":
+        return (
+          <Icon
+            name="sort-alpha-asc"
             size={16}
             color={focused ? "white" : argonTheme.COLORS.PRIMARY}
           />

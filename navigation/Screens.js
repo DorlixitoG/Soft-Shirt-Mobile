@@ -12,7 +12,8 @@ import CodigoVerificacionScreen from "../screens/CodigoVerificacionScreen";
 import ComprasScreen from "../screens/ComprasScreen";
 import LoadingScreen from "../screens/LoadingScreen";
 import VentasScreen from "../screens/VentasScreen";
-
+import ColoresScreen from "../screens/ColoresScreen";
+import TallasScreen from "../screens/TallasScreen";
 // Obtiene el ancho de la pantalla para ajustar el estilo del drawer
 const { width } = Dimensions.get("screen");
 
@@ -105,6 +106,60 @@ function VentasStack(props) {
     </Stack.Navigator>
   );
 }
+function ColoresStack(props) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        mode: "card", // Estilo de transición para las pantallas
+        headerShown: "screen", // Muestra el header en la pantalla
+      }}
+    >
+      <Stack.Screen
+        name="ColoresScreenStack"
+        component={ColoresScreen} // Componente para la pantalla de Compras
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="" // Título del header (vacío en este caso)
+              search // Muestra el botón de búsqueda en el header
+              options // Muestra el botón de opciones en el header
+              navigation={navigation} // Pasa la navegación como prop
+              scene={scene} // Pasa la escena como prop
+            />
+          ),
+          cardStyle: { backgroundColor: "#F8F9FE" }, // Estilo del fondo de la tarjeta
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+function TallasStack(props) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        mode: "card", // Estilo de transición para las pantallas
+        headerShown: "screen", // Muestra el header en la pantalla
+      }}
+    >
+      <Stack.Screen
+        name="TallasScreenStack"
+        component={TallasScreen} // Componente para la pantalla de Compras
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="" // Título del header (vacío en este caso)
+              search // Muestra el botón de búsqueda en el header
+              options // Muestra el botón de opciones en el header
+              navigation={navigation} // Pasa la navegación como prop
+              scene={scene} // Pasa la escena como prop
+            />
+          ),
+          cardStyle: { backgroundColor: "#F8F9FE" }, // Estilo del fondo de la tarjeta
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 // Componente para la configuración del drawer principal
 function AppStack(props) {
@@ -123,7 +178,21 @@ function AppStack(props) {
         name="HomeScreen"
         component={HomeStack} // Muestra la pila de pantallas de Home
         options={{
-          title: "Gestión de Productos",
+          title: "Gestión de Insumos",
+        }}
+      />
+      <Drawer.Screen
+        name="ColoresScreen"
+        component={ColoresStack} // Muestra la pila de pantallas de Compras
+        options={{
+          title: "Gestión de Colores",
+        }}
+      />
+      <Drawer.Screen
+        name="TallasScreen"
+        component={TallasStack} // Muestra la pila de pantallas de Compras
+        options={{
+          title: "Gestión de Tallas",
         }}
       />
       {/* Pantalla de Compras */}
@@ -155,9 +224,10 @@ export default function Screens({ isLoggedIn }) {
     >
       {!isLoggedIn ? (
         <>
+          <Stack.Screen name="App" component={AppStack} />
+
           <Stack.Screen name="Loading" component={LoadingScreen} />
           <Stack.Screen name="SignIn" component={SigninScreen} />
-          <Stack.Screen name="App" component={AppStack} />
           <Stack.Screen
             name="ForgotPassword"
             component={ForgotPasswordScreen}
