@@ -25,10 +25,13 @@ const VentasScreen = () => {
   const estadosPedidosUrl =
     "https://back-end1-9e2f0d364f68.herokuapp.com/api/estadosPedidos";
 
+  const productoUrl =
+    "https://back-end1-9e2f0d364f68.herokuapp.com/api/productos";
   // Estados
   const [pedidos, setPedidos] = useState([]);
   const [clientes, setClientes] = useState({});
   const [insumos, setInsumos] = useState({});
+  const [productos, setProductos] = useState({});
   const [estadosPedidos, setEstadosPedidos] = useState({});
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,6 +48,7 @@ const VentasScreen = () => {
     getClientes();
     getInsumos();
     getEstadosPedidos();
+    getProductos();
   }, []);
 
   // Obtener pedidos desde la API
@@ -86,6 +90,19 @@ const VentasScreen = () => {
         return acc;
       }, {});
       setInsumos(insumosMap);
+    } catch (error) {
+      setShowAlert(true);
+    }
+  };
+
+  const getProductos = async () => {
+    try {
+      const respuesta = await axios.get(productoUrl);
+      const productosMap = respuesta.data.reduce((acc, producto) => {
+        acc[producto.IdProducto] = producto.Referencia; // Usar Referencia en lugar de NombreProducto
+        return acc;
+      }, {});
+      setProductos(productosMap);
     } catch (error) {
       setShowAlert(true);
     }
@@ -231,10 +248,6 @@ const VentasScreen = () => {
                 <Text style={styles.detailText}>
                   {new Date(pedidoSeleccionado.Fecha).toLocaleDateString()}
                 </Text>
-                <Text style={styles.detailHeaderText}>Total:</Text>
-                <Text style={styles.detailText}>
-                  {formatPrice(pedidoSeleccionado.Total)}
-                </Text>
 
                 <Text style={styles.detailHeaderText}>Estado:</Text>
                 <Text style={styles.detailText}>
@@ -250,7 +263,8 @@ const VentasScreen = () => {
                   renderItem={({ item }) => (
                     <View style={styles.detailRow}>
                       <Text style={styles.detailItem}>
-                        {insumos[item.Producto.IdInsumo] || "Desconocido"}
+                        {productos[item.IdProducto] || "Desconocido"}{" "}
+                        {/* Mostrar la referencia del producto */}
                       </Text>
                       <Text style={styles.detailItem}>{item.Cantidad}</Text>
                       <Text style={styles.detailItem}>
@@ -266,7 +280,7 @@ const VentasScreen = () => {
                       <Text style={styles.headerItem}>Producto</Text>
                       <Text style={styles.headerItem}>Cantidad</Text>
                       <Text style={styles.headerItem}>Precio</Text>
-                      <Text style={styles.headerItem}>SubTotal</Text>
+                      <Text style={styles.headerItem}>Total</Text>
                     </View>
                   )}
                 />
