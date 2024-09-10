@@ -15,6 +15,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import AwesomeAlert from "react-native-awesome-alerts";
 import LogoutConfirmation from "../../components/LogoutConfirmation";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Home = ({ navigation }) => {
   const url = "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos";
@@ -46,13 +47,13 @@ const Home = ({ navigation }) => {
 
   // Efecto para obtener datos al cargar el componente
 
-  useEffect(() => {
-    getInsumos();
-    getDisenios();
-    getColores();
-    getTallas();
-  }, [IdInsumo, IdColor]);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      getInsumos();
+      getColores();
+      getTallas();
+    }, []),
+  );
   // Funciones para obtener datos desde la API
 
   const getInsumos = async () => {

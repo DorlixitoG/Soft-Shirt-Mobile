@@ -224,10 +224,9 @@ export default function Screens({ isLoggedIn }) {
     >
       {!isLoggedIn ? (
         <>
-          <Stack.Screen name="App" component={AppStack} />
-
           <Stack.Screen name="Loading" component={LoadingScreen} />
           <Stack.Screen name="SignIn" component={SigninScreen} />
+          <Stack.Screen name="App" component={AppStack} />
           <Stack.Screen
             name="ForgotPassword"
             component={ForgotPasswordScreen}
