@@ -18,7 +18,7 @@ import LogoutConfirmation from "../../components/LogoutConfirmation";
 import { useFocusEffect } from "@react-navigation/native";
 
 const Home = ({ navigation }) => {
-  const url = "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos";
+  const url = "https://softshirt-1c3fad7d72e8.herokuapp.com/api/insumos";
 
   // Estados para manejar datos y UI
 
@@ -69,7 +69,7 @@ const Home = ({ navigation }) => {
   const getDisenios = async () => {
     try {
       const respuesta = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/disenios",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/disenios",
       );
       const DiseniosActivos = respuesta.data.filter(
         (disenio) => disenio.Estado === "Activo",
@@ -84,7 +84,7 @@ const Home = ({ navigation }) => {
   const getColores = async () => {
     try {
       const respuesta = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/colores",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/colores",
       );
       const coloresActivos = respuesta.data.filter(
         (color) => color.Estado === "Activo",
@@ -98,7 +98,7 @@ const Home = ({ navigation }) => {
   const getTallas = async () => {
     try {
       const respuesta = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/tallas",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/tallas",
       );
       const tallasActivas = respuesta.data.filter(
         (talla) => talla.Estado === "Activo",

@@ -19,7 +19,7 @@ import { ColorPicker } from "react-native-color-picker";
 import Slider from "@react-native-community/slider";
 
 const ColoresScreen = ({ navigation }) => {
-  const url = "https://back-end1-9e2f0d364f68.herokuapp.com/api/colores";
+  const url = "https://softshirt-1c3fad7d72e8.herokuapp.com/api/colores";
 
   // Estados para manejar datos y UI
 
@@ -52,7 +52,7 @@ const ColoresScreen = ({ navigation }) => {
   const getColores = async () => {
     try {
       const respuesta = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/colores",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/colores",
       );
       console.log(respuesta.data); // Verifica los datos recibidos
       setColores(respuesta.data);
@@ -82,10 +82,9 @@ const ColoresScreen = ({ navigation }) => {
     try {
       // Verifica si el color está asociado con algún insumo
       const insumosResponse = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/insumos",
       );
 
-      
       const insumos = insumosResponse.data;
 
       const colorActual = Colores.find((color) => color.IdColor === IdColor);

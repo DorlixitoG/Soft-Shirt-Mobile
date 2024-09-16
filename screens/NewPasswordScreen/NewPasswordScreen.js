@@ -30,7 +30,7 @@ const NewPasswordScreen = () => {
   const onSubmitPressed = async () => {
     try {
       await axios.post(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/reset-password",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/reset-password",
         {
           nuevaContrasenia,
           Correo: userEmail,

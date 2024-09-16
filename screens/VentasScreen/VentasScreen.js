@@ -18,15 +18,15 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 const VentasScreen = () => {
   // URLs de la API
-  const pedidosUrl = "https://back-end1-9e2f0d364f68.herokuapp.com/api/pedidos";
+  const pedidosUrl = "https://softshirt-1c3fad7d72e8.herokuapp.com/api/pedidos";
   const clientesUrl =
-    "https://back-end1-9e2f0d364f68.herokuapp.com/api/clientes";
-  const insumosUrl = "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos";
+    "https://softshirt-1c3fad7d72e8.herokuapp.com/api/clientes";
+  const insumosUrl = "https://softshirt-1c3fad7d72e8.herokuapp.com/api/insumos";
   const estadosPedidosUrl =
-    "https://back-end1-9e2f0d364f68.herokuapp.com/api/estadosPedidos";
+    "https://softshirt-1c3fad7d72e8.herokuapp.com/api/estadosPedidos";
 
   const productoUrl =
-    "https://back-end1-9e2f0d364f68.herokuapp.com/api/productos";
+    "https://softshirt-1c3fad7d72e8.herokuapp.com/api/productos";
   // Estados
   const [pedidos, setPedidos] = useState([]);
   const [clientes, setClientes] = useState({});

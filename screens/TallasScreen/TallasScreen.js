@@ -15,7 +15,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import AwesomeAlert from "react-native-awesome-alerts";
 import LogoutConfirmation from "../../components/LogoutConfirmation";
 const TallasScreen = ({ navigation }) => {
-  const url = "https://back-end1-9e2f0d364f68.herokuapp.com/api/tallas";
+  const url = "https://softshirt-1c3fad7d72e8.herokuapp.com/api/tallas";
 
   // Estados para manejar datos y UI
 
@@ -57,7 +57,7 @@ const TallasScreen = ({ navigation }) => {
   const getTallas = async () => {
     try {
       const respuesta = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/tallas",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/tallas",
       );
       console.log(respuesta.data); // Verifica los datos recibidos
       setTallas(respuesta.data);
@@ -84,7 +84,7 @@ const TallasScreen = ({ navigation }) => {
     try {
       // Verifica si la talla está asociado con algún insumo
       const insumosResponse = await axios.get(
-        "https://back-end1-9e2f0d364f68.herokuapp.com/api/insumos",
+        "https://softshirt-1c3fad7d72e8.herokuapp.com/api/insumos",
       );
 
       const insumos = insumosResponse.data;
